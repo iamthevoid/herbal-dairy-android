@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!--<com.iam.herbaldairy.widget.text.Text-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/add"-->
+        <!--android:textColor="@color/almost_black"-->
+        <!--android:textSize="20dp"-->
+        <!--android:layout_margin="8dp"-->
+        <!--android:layout_centerHorizontal="true" />-->
+
+    <!--<ImageView-->
+        <!--android:layout_width="24dp"-->
+        <!--android:layout_height="24dp"-->
+        <!--android:layout_margin="8dp"-->
+        <!--android:layerType="software"-->
+        <!--android:layout_alignParentLeft="false"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:id="@+id/close" />-->
+
+    <!--<FrameLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="1px"-->
+        <!--android:background="@color/black"-->
+        <!--android:id="@+id/divider"-->
+        <!--android:layout_below="@+id/close" />-->
+
+    <!--android:layout_below="@+id/divider"-->
+
+    <com.github.rahatarmanahmed.cpv.CircularProgressView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:cpv_color="@color/header_green"
+        android:id="@+id/progress"
+        android:layout_margin="8dp"
+        android:layout_alignParentLeft="false"
+
+        android:layout_alignParentRight="true" />
+
+    <com.iam.herbaldairy.widget.text.Text
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Фенхель Обыкновенный"
+        android:id="@+id/title"
+        android:layout_margin="8dp"
+        android:textColor="@color/black"
+        android:textSize="20dp" />
+
+    <com.iam.herbaldairy.widget.text.Text
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Foenículum vulgáre"
+        android:textColor="@color/dark_gray_text"
+        android:id="@+id/titleLatin"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_below="@+id/title"
+        android:textSize="18dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:id="@+id/holder"
+        android:padding="8dp"
+        android:layout_below="@+id/titleLatin">
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            app:met_floatingLabelTextColor="@color/almost_black"
+            app:met_bottomTextSize="16dp"
+            app:met_primaryColor="@color/dark_green"
+            app:met_floatingLabel="highlight"
+            android:inputType="numberSigned"
+            app:met_floatingLabelTextSize="14sp"
+            app:met_textColorHint="@color/black"
+            android:id="@+id/weight"
+            android:hint="WEIGHT"
+            android:layout_below="@+id/weight"
+            android:textSize="14sp"
+            android:layout_weight="1" />
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:layout_width="match_parent"
+            android:layout_margin="8dp"
+            android:layout_height="match_parent"
+            app:met_floatingLabelTextColor="@color/almost_black"
+            app:met_primaryColor="@color/dark_green"
+            app:met_floatingLabel="highlight"
+            android:inputType="numberSigned"
+            app:met_floatingLabelTextSize="14sp"
+            app:met_textColorHint="@color/black"
+            android:id="@+id/volume"
+            android:hint="VOLUME"
+            android:layout_below="@+id/weight"
+            android:textSize="14sp"
+            android:layout_weight="1" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/selectType"
+            android:paddingTop="16dp">
+            <com.iam.herbaldairy.widget.text.Text
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14dp"
+                android:layout_margin="4dp"
+                android:textColor="@color/black"
+                android:text="HERBA"
+                android:id="@+id/type"
+                android:layout_centerVertical="true" />
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layerType="software"
+                android:id="@+id/dropdown"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/holder"
+        android:id="@+id/btnHolder">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Добавить"
+            android:background="@color/transparent_white"
+            android:layout_weight="1"
+            android:id="@+id/add"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Закрыть"
+            android:background="@color/transparent_white"
+            android:layout_weight="1"
+            android:id="@+id/close"/>
+    </LinearLayout>
+
+
+</RelativeLayout>

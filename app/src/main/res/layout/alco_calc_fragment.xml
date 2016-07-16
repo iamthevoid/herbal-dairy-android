@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            app:met_floatingLabelTextColor="@color/almost_black"
+            app:met_bottomTextSize="16dp"
+            app:met_primaryColor="@color/dark_green"
+            app:met_floatingLabel="highlight"
+            android:inputType="numberSigned"
+            app:met_floatingLabelTextSize="14sp"
+            app:met_textColorHint="@color/black"
+            android:id="@+id/alcsource"
+            android:hint="ALC SOURCE PERCENT"
+            android:layout_below="@+id/weight"
+            android:textSize="14sp"
+            android:layout_weight="1" />
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            app:met_floatingLabelTextColor="@color/almost_black"
+            app:met_bottomTextSize="16dp"
+            app:met_primaryColor="@color/dark_green"
+            app:met_floatingLabel="highlight"
+            android:inputType="numberSigned"
+            app:met_floatingLabelTextSize="14sp"
+            app:met_textColorHint="@color/black"
+            android:id="@+id/alcresult"
+            android:hint="ALC RESULT PERCENT"
+            android:layout_below="@+id/weight"
+            android:textSize="14sp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:met_floatingLabelTextColor="@color/almost_black"
+            app:met_bottomTextSize="16dp"
+            app:met_primaryColor="@color/dark_green"
+            app:met_floatingLabel="highlight"
+            android:inputType="numberDecimal"
+            app:met_floatingLabelTextSize="14sp"
+            app:met_textColorHint="@color/black"
+            android:id="@+id/spirit"
+            android:hint="VOLUME"
+            android:layout_below="@+id/spirit"
+            android:textSize="14sp"
+            android:layout_weight="1" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="WATER"
+            android:id="@+id/calculatewater"
+            android:layout_weight="1" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SPIRIT"
+            android:id="@+id/calculatespirit"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <com.iam.herbaldairy.widget.text.Text
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:id="@+id/text"
+        android:textColor="@color/black"
+        android:textSize="16dp" />
+
+</LinearLayout>

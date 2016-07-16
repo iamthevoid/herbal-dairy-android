@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="iForward" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="100%" height="100%" viewBox="0 0 240 240" preserveAspectRatio="xMidYMid meet">
+<line fill="none" stroke="#ffffff" stroke-width="20" stroke-miterlimit="10" x1="45.5" y1="125.0332031" x2="206" y2="125.0253906"/>
+<polyline fill="none" stroke="#ffffff" stroke-width="20" stroke-miterlimit="10" points="135.7851563,195.2480469 206,125.0332031
+	135.7832031,54.7851563 "/>
+</svg>

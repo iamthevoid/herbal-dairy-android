@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/mint"
+        android:id="@+id/image"
+        android:layout_marginRight="8dp" />
+
+    <com.iam.herbaldairy.widget.text.Text
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="edit"
+        android:textColor="@color/dark_text_green"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:id="@+id/edit"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="8dp" />
+    <com.iam.herbaldairy.widget.text.Text
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/title"
+        android:textColor="@color/black"
+        android:layout_toRightOf="@+id/image"
+        android:layout_toLeftOf="@+id/edit"
+        android:text="Мелисса лекарственная"
+        android:textSize="16sp"/>
+    <com.iam.herbaldairy.widget.text.Text
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/type"
+        android:textColor="@color/black"
+        android:text="(flores)"
+        android:textSize="14sp"
+        android:layout_below="@+id/title"
+        android:layout_toRightOf="@+id/latin" />
+    <com.iam.herbaldairy.widget.text.Text
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/latin"
+        android:textColor="@color/almost_black"
+        android:layout_toRightOf="@+id/image"
+        android:text="Matricāria chamomīlla"
+        android:textSize="14sp"
+        android:layout_below="@+id/title" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/infoholder"
+        android:weightSum="4"
+        android:layout_toRightOf="@+id/image"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/latin">
+        <com.iam.herbaldairy.widget.text.Text
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/weighttext"
+            android:textColor="@color/black"
+            android:layout_toRightOf="@+id/image"
+            android:layout_toLeftOf="@+id/edit"
+            android:text="Weight:"
+            android:textSize="16dp"
+            android:layout_weight="1"/>
+        <com.iam.herbaldairy.widget.text.Text
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/weight"
+            android:textColor="@color/dark_text_green"
+            android:layout_toRightOf="@+id/image"
+            android:layout_toLeftOf="@+id/edit"
+            android:text="435"
+            android:textSize="16dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textStyle="bold" />
+        <com.iam.herbaldairy.widget.text.Text
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/volumetext"
+            android:textColor="@color/black"
+            android:layout_toRightOf="@+id/image"
+            android:layout_toLeftOf="@+id/edit"
+            android:text="Volume:"
+            android:textSize="16dp"
+            android:layout_weight="1"/>
+        <com.iam.herbaldairy.widget.text.Text
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/volume"
+            android:textColor="@color/dark_text_green"
+            android:layout_toRightOf="@+id/image"
+            android:layout_toLeftOf="@+id/edit"
+            android:text="4"
+            android:textSize="16dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</RelativeLayout>

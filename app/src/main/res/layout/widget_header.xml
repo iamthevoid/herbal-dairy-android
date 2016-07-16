@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/header_green">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/lheader">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/left_action_image"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/titleHolder"
+        android:layout_toRightOf="@+id/lheader"
+        android:layout_toLeftOf="@+id/right_options"
+        android:layout_alignBottom="@+id/lheader"
+        android:layout_alignTop="@+id/lheader">
+
+        <com.iam.herbaldairy.widget.text.Text
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/title"
+            android:text="Title"
+            android:gravity="center_horizontal" />
+
+        <com.iam.herbaldairy.widget.text.Text
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Subtitle"
+            android:gravity="center_horizontal"
+            android:id="@+id/subtitle"
+            android:layout_alignParentBottom="true" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/right_options"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/lheader"
+        android:layout_alignBottom="@+id/lheader">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/rheader1">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/right_action_image_1"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/rheader2">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/right_action_image_2"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/rholdert">
+
+            <com.iam.herbaldairy.widget.text.Text
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/right_text_button"
+                android:visibility="visible"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:id="@+id/shadow"
+        android:layout_alignParentBottom="true"
+        android:background="#ccc"/>
+
+</RelativeLayout>

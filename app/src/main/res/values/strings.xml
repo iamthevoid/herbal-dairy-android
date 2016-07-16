@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">HerbalDairy</string>
+    <string name="own_herbas">owfmfkmrembn_hfertsdbfs</string>
+    <string name="own_absinthes">owfmfkmrembn_akfdbasbirjkntkl_-es</string>
+    <string name="finish_dates">fhjninsfferislkfgh_fdfaltlles</string>
+    <string name="finish_dates_sp">fhjninsfferislkfgh_sssssppp_fdfaltlles</string>
+
+
+    <string name="add">Добавить</string>
+
+    <string-array name="herbs">
+        <item>Аир обыкновенный</item>
+        <item>Анис обыкновенный</item>
+        <item>Бадьян</item>
+        <item>Душица обыкновенная</item>
+        <item>Дягиль лекарственный</item>
+        <item>Иссоп лекарственный</item>
+        <item>Кардамон настоящий</item>
+        <item>Кориандр</item>
+        <item>Лимон</item>
+        <item>Майоран</item>
+        <item>Мелисса лекарственная</item>
+        <item>Мускатный орех</item>
+        <item>Мята перечная</item>
+        <item>Полынь горькая</item>
+        <item>Полынь понтийская</item>
+        <item>Ромашка аптечная</item>
+        <item>Солодка</item>
+        <item>Тимьян обыкновенный</item>
+        <item>Тмин обыкновенный</item>
+        <item>Фенхель обыкновенный</item>
+        <item>Эстрагон</item>
+    </string-array>
+</resources>
