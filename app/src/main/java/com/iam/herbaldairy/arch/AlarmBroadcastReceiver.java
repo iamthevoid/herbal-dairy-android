@@ -1,21 +1,16 @@
 package com.iam.herbaldairy.arch;
 
-import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.iam.herbaldairy.R;
 import com.iam.herbaldairy.Time;
@@ -48,13 +43,14 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
 
     public void SetAlarm(Context context)
     {
-        AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, 0);
 
         SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.finish_dates_sp), Context.MODE_PRIVATE);
         String sDates = preferences.getString(context.getString(R.string.finish_dates), "[]");
-        Date date = new Date();
+        Date date = new Date(0);
+        Log.d("date", date + "");
         try {
             JSONArray jDates = new JSONArray(sDates);
             final int datesCount = jDates.length();
@@ -62,7 +58,7 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
             for (int i = 0; i < datesCount; i++) {
                 dates[i] = Time.dateFormat.parse(jDates.getString(i));
             }
-            if (dates.length > 0) date = Time.theEarliestDate(dates);
+            if (dates.length > 0) date = Time.earliestOfDates(dates);
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (ParseException e) {

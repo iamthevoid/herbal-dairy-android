@@ -66,7 +66,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="3"
+        android:weightSum="2"
         android:id="@+id/holder"
         android:padding="8dp"
         android:layout_below="@+id/titleLatin">
@@ -87,21 +87,21 @@
             android:layout_below="@+id/weight"
             android:textSize="14sp"
             android:layout_weight="1" />
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:layout_width="match_parent"
-            android:layout_margin="8dp"
-            android:layout_height="match_parent"
-            app:met_floatingLabelTextColor="@color/almost_black"
-            app:met_primaryColor="@color/dark_green"
-            app:met_floatingLabel="highlight"
-            android:inputType="numberSigned"
-            app:met_floatingLabelTextSize="14sp"
-            app:met_textColorHint="@color/black"
-            android:id="@+id/volume"
-            android:hint="VOLUME"
-            android:layout_below="@+id/weight"
-            android:textSize="14sp"
-            android:layout_weight="1" />
+        <!--<com.rengwuxian.materialedittext.MaterialEditText-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_margin="8dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--app:met_floatingLabelTextColor="@color/almost_black"-->
+            <!--app:met_primaryColor="@color/dark_green"-->
+            <!--app:met_floatingLabel="highlight"-->
+            <!--android:inputType="numberSigned"-->
+            <!--app:met_floatingLabelTextSize="14sp"-->
+            <!--app:met_textColorHint="@color/black"-->
+            <!--android:id="@+id/volume"-->
+            <!--android:hint="VOLUME"-->
+            <!--android:layout_below="@+id/weight"-->
+            <!--android:textSize="14sp"-->
+            <!--android:layout_weight="1" />-->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

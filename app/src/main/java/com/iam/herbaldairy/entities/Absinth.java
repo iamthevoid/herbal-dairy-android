@@ -2,10 +2,12 @@ package com.iam.herbaldairy.entities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.iam.herbaldairy.Calculator;
 import com.iam.herbaldairy.R;
 import com.iam.herbaldairy.Time;
+import com.iam.herbaldairy.widget.text.Text;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,27 +20,68 @@ import java.util.concurrent.TimeUnit;
 
 public class Absinth implements JSONSerializable {
 
-    private static String ABSINTH_PREFS = "absinth_prefs";
-    private static ArrayList<Absinth> absinthes = new ArrayList<>();
+    public static String ABSINTH_PREFS = "absinth_prefs";
+    public static ArrayList<Absinth> absinthes = new ArrayList<>();
 
     private double spiritVolume;
+    private boolean done = false;
     private ArrayList<Herb> herbs = new ArrayList<>();
 
-    private long resultVolume;
+    private double resultVolume;
     private int alcPercent;
 
     private String comment;
     private Date startInfuseDate;
     private Date distillDate;
 
-    public long getInfuseInterval(TimeUnit timeUnit) {
-        Date date = distillDate == null ? new Date(System.currentTimeMillis()) : distillDate;
-        long diffInMillies = date.getTime() - startInfuseDate.getTime();
-        return timeUnit.convert(diffInMillies,timeUnit);
+    private int distillTemperature;
+
+    public Absinth(Date startInfuseDate, double spiritVolume, ArrayList<Herb> herbs) {
+        this.startInfuseDate = startInfuseDate;
+        this.spiritVolume = spiritVolume;
+        this.herbs = herbs;
+        for (Herb herb : herbs) {
+            if (Herb.containsHerbName(herb.name())) {
+                Herb.herbByName(herb.name()).add(-herb.weight(), startInfuseDate);
+            }
+        }
+    }
+
+    public long getInfuseInterval() {
+        Log.d("iinterval", Time.interval(startInfuseDate, distillDate, TimeUnit.DAYS) + "");
+        return Time.interval(startInfuseDate, distillDate, TimeUnit.DAYS);
     }
 
     public double dilutedSpiritVolume(int percent) {
         return Calculator.volumeOfDilutedSpirit(spiritVolume, 96, percent);
+    }
+
+    public static ArrayList<Absinth> absinthes() {
+        return absinthes;
+    }
+
+    public void setResultVolume(double resultVolume) {
+        this.resultVolume = resultVolume;
+    }
+
+    public void setAlcPercent(int alcPercent) {
+        this.alcPercent = alcPercent;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public void setDistillDate(Date distillDate) {
+        this.distillDate = distillDate;
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDistillTemperature(int distillTemperature) {
+        this.distillTemperature = distillTemperature;
     }
 
     public static void writeToPreferences(Context context) {
@@ -55,6 +98,7 @@ public class Absinth implements JSONSerializable {
     }
 
     public static void readFromPreferences(Context context) {
+        if (absinthes == null) absinthes = new ArrayList<>();
         SharedPreferences preferences = context.getSharedPreferences(ABSINTH_PREFS, Context.MODE_PRIVATE);
         String sAbsinthes = preferences.getString(context.getString(R.string.own_absinthes), "");
         if (!sAbsinthes.equals("")) {
@@ -131,6 +175,23 @@ public class Absinth implements JSONSerializable {
         return this.hashCode() == obj.hashCode();
     }
 
+    public Date startInfuseDate() {
+        return startInfuseDate;
+    }
+
+    public double spiritVolume() {
+        return spiritVolume;
+    }
+
+    public double resultVolume() {
+        return resultVolume;
+    }
+
+    public static void add(Absinth absinth) {
+        System.out.println("absinthe " + !absinthes.contains(absinth));
+        if (!absinthes.contains(absinth)) { absinthes.add(absinth); }
+    }
+
     private enum JSONKey {
 
         SpiritVolume    ("spirit_volume"),
@@ -146,5 +207,30 @@ public class Absinth implements JSONSerializable {
         JSONKey(String key) {
             this.key = key;
         }
+    }
+
+    public Stage stage() {
+        if (distillDate == null) {
+            return Stage.Infuse;
+        } else if (Time.today().equals(Time.clearHMSPrecision(distillDate))) {
+            return Stage.Distill;
+        } else if (Time.now().before(Time.addPeriod(distillDate, 1, TimeUnit.DAYS))) {
+            return Stage.Colouring;
+        } else if (Time.now().before(Time.addPeriod(distillDate, 14, TimeUnit.DAYS))) {
+            return Stage.Aging;
+        } else if (done) {
+            return Stage.Done;
+        } else {
+            return Stage.Production;
+        }
+    }
+
+    public enum Stage {
+        Infuse,
+        Distill,
+        Colouring,
+        Aging,
+        Production,
+        Done;
     }
 }

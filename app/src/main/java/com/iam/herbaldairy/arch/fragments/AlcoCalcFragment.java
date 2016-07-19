@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.iam.herbaldairy.Calculator;
+import com.iam.herbaldairy.Editor;
 import com.iam.herbaldairy.R;
 import com.iam.herbaldairy.widget.Header;
 import com.iam.herbaldairy.widget.assets.svg;
@@ -40,9 +41,9 @@ public class AlcoCalcFragment extends Fragment implements Header.HeaderManipulat
         view = inflater.inflate(R.layout.alco_calc_fragment, container, false);
 
         alcResultPercentET = (EditText) view.findViewById(R.id.alcresult);
-        alcResultPercentET.addTextChangedListener(percentField(alcResultPercentET));
+        alcResultPercentET.addTextChangedListener(Editor.integerTextWatcher(alcResultPercentET, 2));
         alcSourcePercentET = (EditText) view.findViewById(R.id.alcsource);
-        alcSourcePercentET.addTextChangedListener(percentField(alcSourcePercentET));
+        alcSourcePercentET.addTextChangedListener(Editor.integerTextWatcher(alcSourcePercentET, 2));
         spiritVolumeET = (EditText) view.findViewById(R.id.spirit);
         calculateWaterButton = (Button) view.findViewById(R.id.calculatewater);
         calculateSpiritButton = (Button) view.findViewById(R.id.calculatespirit);
@@ -175,35 +176,5 @@ public class AlcoCalcFragment extends Fragment implements Header.HeaderManipulat
                         spiritVolumeET.getText().toString().equals("");
     }
 
-    private TextWatcher percentField(final EditText editText) {
-        return new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if (editable.length() > 0) {
-                    final String str = editable.toString();
-                    Pattern pattern = Pattern.compile("\\D");
-                    final String s = editable.toString();
-                    String last = String.valueOf(s.charAt(editable.length() - 1));
-                    Matcher matcher = pattern.matcher(last);
-                    if (matcher.find()) {
-                        editText.setText(s.replaceAll("\\D", ""));
-                    }
-                    if (editable.length() > 2) {
-                        editText.setText(str.substring(0, str.length()-1));
-                        editText.setSelection(2);
-                    }
-                }
-            }
-        };
-    }
 }

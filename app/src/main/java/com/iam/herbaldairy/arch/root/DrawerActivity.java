@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -22,18 +23,22 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.iam.herbaldairy.R;
+import com.iam.herbaldairy.Time;
 import com.iam.herbaldairy.arch.InfusionTickerService;
 import com.iam.herbaldairy.arch.fragments.HerbFragment;
 import com.iam.herbaldairy.entities.Absinth;
 import com.iam.herbaldairy.entities.Herb;
 import com.iam.herbaldairy.widget.Decorator;
 import com.iam.herbaldairy.widget.Header;
-import com.iam.herbaldairy.widget.HerbAddDialog;
+import com.iam.herbaldairy.widget.AddHerbDialog;
+
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class DrawerActivity extends AppCompatActivity implements DrawerCallbacks,
         Header.FragmentDataSender,
         Header.ToggleClicker,
-        HerbAddDialog.Container {
+        AddHerbDialog.Container {
 
     Header header;
 

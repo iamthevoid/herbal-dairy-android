@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.RecyclerView;
@@ -19,30 +21,30 @@ import com.bumptech.glide.Glide;
 import com.iam.herbaldairy.R;
 import com.iam.herbaldairy.entities.Herb;
 import com.iam.herbaldairy.widget.Header;
-import com.iam.herbaldairy.widget.HerbAddDialog;
+import com.iam.herbaldairy.widget.AddHerbDialog;
 import com.iam.herbaldairy.widget.assets.svg;
 import com.iam.herbaldairy.widget.text.Text;
 
 import java.util.List;
 
-public class HerbFragment extends Fragment implements Header.HeaderManipulation, HerbAddDialog.HasDataToReload {
+public class HerbFragment extends Fragment implements Header.HeaderManipulation, AddHerbDialog.HasDataToReload {
 
     private ArrayAdapter<String> adapter;
     private RecyclerView view;
     private HerbListAdapter listAdapter;
     private com.iam.herbaldairy.widget.LinearLayoutManager manager;
-    private HerbAddDialog dialog;
+    private AddHerbDialog dialog;
     private ListPopupWindow addHerbLpw;
-    private HerbAddDialog.Container container;
+    private AddHerbDialog.Container container;
     private String[] herbs;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = (RecyclerView) inflater.inflate(R.layout.recycler_fragment, container, false);
-        dialog = new HerbAddDialog(getActivity());
+        dialog = new AddHerbDialog(getActivity());
 
-        this.container = ((HerbAddDialog.Container)getActivity());
+        this.container = ((AddHerbDialog.Container)getActivity());
 
         herbs = getActivity().getResources().getStringArray(R.array.herbs);
         adapter = new ArrayAdapter<>(
@@ -76,12 +78,12 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
 
         @Override
         public HerbaVH onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new HerbaVH(inflater.inflate(R.layout.herba_list_item, parent, false));
+            return new HerbaVH(inflater.inflate(R.layout.herb_list_item, parent, false));
         }
 
         @Override
         public void onBindViewHolder(HerbaVH holder, int position) {
-            holder.onBind(list.get(position));
+            holder.onBind(position);
         }
 
         @Override
@@ -110,7 +112,8 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
                 image = (ImageView) view.findViewById(R.id.image);
             }
 
-            void onBind(Herb herb) {
+            void onBind(final int position) {
+                Herb herb = Herb.list().get(position);
                 title.setText(herb.name());
                 latin.setText(herb.latin());
                 weight.setText(herb.weight() + "g.");
@@ -120,13 +123,28 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
                         .load(herb.imageURL())
                         .centerCrop()
                         .into(image);
+                edit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Fragment fragment = new HerbEditFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putInt(getString(R.string.herb_to_edit), position);
+                        fragment.setArguments(bundle);
+                        FragmentManager fm = getActivity().getSupportFragmentManager();
+                        FragmentTransaction ft = fm.beginTransaction();
+                        ft
+                                .replace(R.id.container, fragment, HerbEditFragment.class.getCanonicalName())
+                                .addToBackStack(null)
+                                .commit();
+                    }
+                });
             }
 
         }
     }
 
     @Override
-    public void reloadData() {
+    public void reloadData(Herb herb) {
         RecyclerView.Adapter adapter = view.getAdapter();
         adapter.notifyDataSetChanged();
     }
@@ -175,9 +193,9 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         if (Herb.containsHerbName(herbs[i])) {
-                            dialog.setHerb(Herb.herbByName(herbs[i]), HerbAddDialog.From.HerbFragmentByHerb);
+                            dialog.setHerb(Herb.herbByName(herbs[i]), AddHerbDialog.From.HerbFragmentByHerb);
                         }
-                        dialog.setHerb(herbs[i]);
+                        dialog.setHerb(herbs[i], AddHerbDialog.From.HerbFragmentByName);
                         dialog.setDataReloader(HerbFragment.this);
                         Log.d("onItemClick", herbs[i]);
                         container.addView(dialog);
@@ -185,7 +203,6 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
                     }
                 });
                 addHerbLpw.show();
-
             }
         };
     }

@@ -4,7 +4,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,37 +15,57 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.iam.herbaldairy.R;
+import com.iam.herbaldairy.Time;
+import com.iam.herbaldairy.entities.Absinth;
 import com.iam.herbaldairy.widget.Header;
-import com.iam.herbaldairy.widget.HerbAddDialog;
-import com.iam.herbaldairy.widget.LinearLayoutManager;
+import com.iam.herbaldairy.widget.AddHerbDialog;
 import com.iam.herbaldairy.widget.assets.svg;
+import com.iam.herbaldairy.widget.text.Text;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 public class AbsinthesFragment extends Fragment implements Header.HeaderManipulation {
 
     private AbsintheAdapter listAdapter;
     private RecyclerView view;
     private LinearLayoutManager manager;
-    private HerbAddDialog.Container container;
-    private String[] herbs;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Absinth.readFromPreferences(getContext());
         view = (RecyclerView) inflater.inflate(R.layout.recycler_fragment, container, false);
 
-        this.container = ((HerbAddDialog.Container)getActivity());
-
-        herbs = getActivity().getResources().getStringArray(R.array.herbs);
-
-
         listAdapter = new AbsintheAdapter(getContext());
-        manager = new com.iam.herbaldairy.widget.LinearLayoutManager(getContext());
+        manager = new LinearLayoutManager(getContext());
         view.setAdapter(listAdapter);
         view.setLayoutManager(manager);
+        listAdapter.notifyDataSetChanged();
+        Log.d("absinthe cococo", Absinth.absinthes().size() + "");
 
         ((Header.FragmentDataSender)getActivity()).onFragmentOpen(this);
         Log.d("onCreateView", "done");
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("fragment", "onStart()");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("fragment", "onResume()");
+        ((Header.FragmentDataSender)getActivity()).onFragmentOpen(this);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Log.d("fragment", "onAttach()");
     }
 
     @Override
@@ -80,7 +103,12 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                FragmentManager manager = ((AppCompatActivity)getContext()).getSupportFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction
+                        .replace(R.id.container, new AddAbsinthFragment(), AddAbsinthFragment.class.getCanonicalName())
+                        .setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .commit();
             }
         };
     }
@@ -115,23 +143,41 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
 
         @Override
         public AbsintheVH onCreateViewHolder(ViewGroup parent, int viewType) {
-            return null;
+            return new AbsintheVH(inflater.inflate(R.layout.absinthe_list_item, parent, false));
         }
 
         @Override
         public void onBindViewHolder(AbsintheVH holder, int position) {
-
+            holder.onBind(Absinth.absinthes.get(position));
         }
 
         @Override
         public int getItemCount() {
-            return 0;
+            System.out.println(Absinth.absinthes.size());
+            return Absinth.absinthes.size();
         }
 
         public class AbsintheVH extends RecyclerView.ViewHolder {
 
+            private Text date;
+            private Text volume;
+            private Text interval;
+            private Text stage;
+
             public AbsintheVH(View itemView) {
                 super(itemView);
+                date = (Text) itemView.findViewById(R.id.date);
+                volume = (Text) itemView.findViewById(R.id.volume);
+                interval = (Text) itemView.findViewById(R.id.interval);
+                stage = (Text) itemView.findViewById(R.id.stage);
+            }
+
+            public void onBind(Absinth absinth) {
+                final Date idate = absinth.startInfuseDate();
+                this.date.setText(Time.monthDay(idate) + " " + Time.monthName(idate) + ", " + Time.year(idate));
+                volume.setText((!absinth.isDone() ? absinth.spiritVolume() : absinth.resultVolume()) + "l");
+                interval.setText(absinth.getInfuseInterval() < 21 ? (absinth.getInfuseInterval() + "d") : ((absinth.getInfuseInterval() / 7) + "w"));
+                stage.setText(absinth.stage().toString());
             }
         }
     }

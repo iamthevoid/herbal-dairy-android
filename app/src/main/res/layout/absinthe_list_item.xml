@@ -1,22 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
 
     <com.iam.herbaldairy.widget.text.Text
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/date"/>
+        android:text="29 Сентября, 2016"
+        android:id="@+id/date"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="8dp"
+        android:textColor="@color/black"
+        android:textSize="20dp" />
 
     <com.iam.herbaldairy.widget.text.Text
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/volume"/>
+        android:text="volume: "
+        android:id="@+id/vtext"
+        android:layout_alignParentLeft="true"
+        android:textSize="16dp"
+        android:layout_below="@+id/date"
+        android:layout_marginRight="0dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
 
     <com.iam.herbaldairy.widget.text.Text
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/interval"/>
+        android:text="1.8l"
+        android:textColor="@color/dark_text_green"
+        android:id="@+id/volume"
+        android:layout_alignParentLeft="false"
+        android:layout_below="@+id/date"
+        android:textSize="16dp"
+        android:layout_toRightOf="@+id/vtext"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <com.iam.herbaldairy.widget.text.Text
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="interval: "
+        android:id="@+id/itext"
+        android:layout_below="@+id/date"
+        android:textSize="16dp"
+        android:layout_toLeftOf="@+id/interval"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <com.iam.herbaldairy.widget.text.Text
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20d"
+        android:textColor="@color/dark_text_green"
+
+        android:id="@+id/interval"
+        android:layout_below="@+id/date"
+        android:layout_centerHorizontal="true"
+        android:textSize="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp" />
+
+    <com.iam.herbaldairy.widget.text.Text
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="stage: "
+        android:id="@+id/stext"
+        android:layout_alignParentRight="false"
+        android:layout_below="@+id/date"
+        android:textSize="16dp"
+        android:layout_toLeftOf="@+id/stage"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <com.iam.herbaldairy.widget.text.Text
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Production"
+        android:id="@+id/stage"
+        android:textColor="@color/dark_text_green"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/date"
+        android:textSize="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <com.iam.herbaldairy.widget.text.Text
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="edit"
+        android:id="@+id/edit"
+        android:textColor="@color/dark_text_green"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="8dp" />
 
 </RelativeLayout>

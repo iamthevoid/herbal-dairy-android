@@ -5,9 +5,8 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,23 +30,21 @@ import org.jsoup.nodes.Document;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class HerbAddDialog extends RelativeLayout {
+public class AddHerbDialog extends RelativeLayout {
 
     private From from;
     private Herb herb;
     private String description = "";
     private String imageUrl = "";
 
-    HasDataToReload hasDataToReload;
+    private HasDataToReload hasDataToReload;
 
     private boolean loaded = false;
 
     private CircularProgressView loadHerbDetailsProgress;
     private Text herbNameText;
-    private Text herbLatinNameText;
+    private Text latinNameText;
     private Button closeDialogBTN;
     private Button addHerbBTN;
 //    private ImageView closeDialogBTN;
@@ -55,7 +52,6 @@ public class HerbAddDialog extends RelativeLayout {
     private Text typeText;
 
     private EditText weightET;
-    private EditText volumeET;
     private RelativeLayout selectTypeBTN;
 
     private PopupMenu popupMenu;
@@ -64,12 +60,12 @@ public class HerbAddDialog extends RelativeLayout {
     private String[] types = Type.names();
 
 
-    public HerbAddDialog(Context context) {
+    public AddHerbDialog(Context context) {
         super(context);
         init(context);
     }
 
-    public HerbAddDialog(Context context, AttributeSet attrs) {
+    public AddHerbDialog(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
@@ -78,7 +74,6 @@ public class HerbAddDialog extends RelativeLayout {
         ((AppCompatActivity)context).getLayoutInflater().inflate(R.layout.dialog_add_herb, this);
 
         weightET = (EditText) findViewById(R.id.weight);
-        volumeET = (EditText) findViewById(R.id.volume);
 
         popupAdapter = new ArrayAdapter<String>(context, R.layout.popup_item, types);
         selectTypeBTN = (RelativeLayout) findViewById(R.id.selectType);
@@ -102,7 +97,8 @@ public class HerbAddDialog extends RelativeLayout {
         loadHerbDetailsProgress = (CircularProgressView) findViewById(R.id.progress);
         loadHerbDetailsProgress.setIndeterminate(true);
         loadHerbDetailsProgress.startAnimation();
-        herbLatinNameText = (Text) findViewById(R.id.titleLatin);
+        loadHerbDetailsProgress.setVisibility(INVISIBLE);
+        latinNameText = (Text) findViewById(R.id.titleLatin);
         typeText = (Text) findViewById(R.id.type);
         addHerbBTN = (Button) findViewById(R.id.add);
         addHerbBTN.setOnClickListener(new OnClickListener() {
@@ -113,7 +109,7 @@ public class HerbAddDialog extends RelativeLayout {
                     final Type type = Type.valueOf(stringType);
                     switch (from) {
                         case HerbFragmentByName:
-                            herb.add(getIntFromField(weightET), getIntFromField(volumeET));
+                            herb.add(getIntFromField(weightET));//, getIntFromField(volumeET));
                             herb.setType(type);
                             Herb.addToOwnHerbs(herb);
                             break;
@@ -121,8 +117,18 @@ public class HerbAddDialog extends RelativeLayout {
                             if (herb.type() != type) {
                                 herb = new Herb(herb, type);
                             }
-                            herb.add(getIntFromField(weightET), getIntFromField(volumeET));
+                            herb.add(getIntFromField(weightET));//, getIntFromField(volumeET));
                             Herb.addToOwnHerbs(herb);
+                            break;
+                        case AddAbsintheFragmentByName:
+                            herb.add(getIntFromField(weightET));
+                            herb.setType(type);
+                            break;
+                        case AddAbsintheFragmentByHerb:
+                            if (herb.type() != type) {
+                                herb = new Herb(herb, type);
+                            }
+                            herb.add(getIntFromField(weightET));
                             break;
                     }
                     close();
@@ -132,7 +138,6 @@ public class HerbAddDialog extends RelativeLayout {
             }
         });
         closeDialogBTN = (Button) findViewById(R.id.close);
-//        closeDialogBTN.setImageDrawable(svg.x.drawable());
         closeDialogBTN.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,24 +158,32 @@ public class HerbAddDialog extends RelativeLayout {
     }
 
     private void close() {
-        hasDataToReload.reloadData();
+        hasDataToReload.reloadData(herb);
         ViewGroup viewGroup = (ViewGroup) this.getParent();
         viewGroup.removeAllViews();
     }
 
-    public void setHerb(String herb) {
-        this.from = From.HerbFragmentByName;
-        herbLatinNameText.setText("");
+    public void setHerb(String herb, From from) {
+        this.from = from;
+        final Herb inOwnHerbs = Herb.herbByName(herb);
         herbNameText.setText(herb);
-        loadDataFromWiki(herb);
+        if (inOwnHerbs != null) {
+            this.herb = new Herb(inOwnHerbs);
+            latinNameText.setText(this.herb.latin());
+            Log.d("weight", this.herb.weight() + "");
+        } else {
+            latinNameText.setText("");
+            loadDataFromWiki(herb);
+        }
     }
 
     public void setHerb(Herb herb, From from) {
         this.from = from;
-        this.herb = herb;
+        if (from == From.AddAbsintheFragmentByHerb) this.herb = new Herb(herb);
+        else this.herb = herb;
         loaded = true;
         herbNameText.setText(herb.name());
-        herbLatinNameText.setText(herb.latin());
+        latinNameText.setText(herb.latin());
     }
 
     public interface Container {
@@ -178,7 +191,7 @@ public class HerbAddDialog extends RelativeLayout {
     }
 
     public interface HasDataToReload {
-        void reloadData();
+        void reloadData(Herb herb);
     }
 
     public void loadDataFromWiki(final String herb) {
@@ -205,14 +218,14 @@ public class HerbAddDialog extends RelativeLayout {
                 Document doc = Jsoup.parse(s);
                 String lat = latinNameFromHTML(doc);
                 imageUrl = imageSrcFromHTML(doc);
-                description = s;
-                herbLatinNameText.setText(lat);
+//                description = s;
+                latinNameText.setText(lat);
                 loadHerbDetailsProgress.setVisibility(INVISIBLE);
                 loaded = true;
-                HerbAddDialog.this.herb = new Herb(herb);
-                HerbAddDialog.this.herb.setDescription(description);
-                HerbAddDialog.this.herb.setImageURL(imageUrl);
-                HerbAddDialog.this.herb.setLatinName(lat);
+                AddHerbDialog.this.herb = new Herb(herb);
+//                AddHerbDialog.this.herb.setDescription(description);
+                AddHerbDialog.this.herb.setImageURL(imageUrl);
+                AddHerbDialog.this.herb.setLatinName(lat);
                 loaded = true;
 
             }
@@ -228,38 +241,10 @@ public class HerbAddDialog extends RelativeLayout {
         return doc.select("div.mw-content-ltr p i span[lang=la]").get(0).text().toUpperCase();
     }
 
-
-
-    private TextWatcher onlyIntegerInField (final EditText editText) {
-        return new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if (editable.length() > 0) {
-                    Pattern pattern = Pattern.compile("\\D");
-                    final String s = editable.toString();
-                    String last = String.valueOf(s.charAt(editable.length() - 1));
-                    Matcher matcher = pattern.matcher(last);
-                    if (matcher.find()) {
-                        editText.setText(s.replaceAll("\\D", ""));
-                    }
-                }
-            }
-        };
-    }
-
     public enum From {
         HerbFragmentByName,
         HerbFragmentByHerb,
-        AbsinthPage;
+        AddAbsintheFragmentByName,
+        AddAbsintheFragmentByHerb;
     }
 }

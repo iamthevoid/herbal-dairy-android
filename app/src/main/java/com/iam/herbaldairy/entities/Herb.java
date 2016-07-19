@@ -2,6 +2,7 @@ package com.iam.herbaldairy.entities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.iam.herbaldairy.R;
 import com.iam.herbaldairy.Time;
@@ -24,19 +25,25 @@ public class Herb implements JSONSerializable {
     private String                  name;
     private String                  latinName;
     private int                     weight;
-    private int                     volume;
-    private TreeMap<Date, int[]>    weightStamps;
+//    private int                     volume;
+    private double                  volumeFactor;
+    private double                  dryFactor;
+    private double                  dryTime;
+    private TreeMap<Date, Integer>    weightStamps;
     private Type type;
 
     private String                  imageUrl;
-    private String                  description;
+//    private String                  description;
 
     public Herb(String name) {
         this.name = name;
         this.weight = 0;
-        this.volume = 0;
+//        this.volume = 0;
+        this.volumeFactor = 0;
+        this.dryFactor = 0;
+        this.dryTime = 0;
         weightStamps = new TreeMap<>();
-        addTimeStamp(weight, volume);
+        addTimeStamp(weight);
     }
 
     public Herb(JSONObject jHerba) {
@@ -44,10 +51,11 @@ public class Herb implements JSONSerializable {
         try {
             name  = jHerba.getString(JSONKey.Name.key);
             weight  = jHerba.getInt(JSONKey.Weight.key);
-            volume  = jHerba.getInt(JSONKey.Volume.key);
+            volumeFactor = jHerba.getDouble(JSONKey.VolumeFactor.key);
             type  = Type.valueOf(jHerba.getString(JSONKey.Type.key));
             latinName  = jHerba.getString(JSONKey.LatinName.key);
-            description  = jHerba.getString(JSONKey.Description.key);
+            dryFactor  = jHerba.getDouble(JSONKey.DryFactor.key);
+            dryTime  = jHerba.getDouble(JSONKey.DryTime.key);
             imageUrl  = jHerba.getString(JSONKey.ImageURL.key);
             JSONArray ts = jHerba.getJSONArray(JSONKey.WeightStamps.key);
 
@@ -61,59 +69,82 @@ public class Herb implements JSONSerializable {
                     e.printStackTrace();
                 }
 
-                weightStamps.put(date, new int[]{jEntry.getInt(JSONKey.Weight.key), jEntry.getInt(JSONKey.Volume.key)});
+                weightStamps.put(date, jEntry.getInt(JSONKey.Weight.key));
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    public Herb(Herb herb, Type type) {
+    public Herb(Herb herb) {
         this.name = herb.name();
         this.weight = 0;
-        this.volume = 0;
+        this.volumeFactor = 0;
+        this.dryFactor = 0;
+        this.dryTime = 0;
         this.latinName = herb.latinName;
         this.imageUrl = herb.imageURL();
-        this.description = herb.description();
-        this.type = type;
+//        this.description = herb.description();
         weightStamps = new TreeMap<>();
-        addTimeStamp(weight, volume);
+        addTimeStamp(weight);
     }
 
+    public Herb(Herb herb, Type type) {
+        this(herb);
+        this.type = type;
+    }
 
-    public void add(int weight, int volume) {
+    public void add(int weight) {
         this.weight += weight;
-        this.volume += volume;
-        addTimeStamp(weight, volume);
+        addTimeStamp(this.weight);
+    }
+
+    public void add(int weight, Date date) {
+        this.weight += weight;
+        addTimeStamp(this.weight, date);
     }
 
     public void setType(Type type) {
         this.type = type;
     }
 
-    public void addTimeStamp(int weight, int volume) {
-        weightStamps.put(new Date(System.currentTimeMillis()), new int[]{weight,volume});
+    public void setDryFactor(double dryFactor) {
+        this.dryFactor = dryFactor;
+    }
+
+    public void setDryTime(double dryTime) {
+        this.dryTime = dryTime;
+    }
+
+    public void addTimeStamp(int weight) {
+        weightStamps.put(new Date(System.currentTimeMillis()), weight);
+    }
+
+    public void addTimeStamp(int weight, Date date) {
+        weightStamps.put(date, weight);
     }
 
     public boolean isActive() {
         return weight > 0;
     }
 
+    @Override
     public JSONObject getJSON() {
         JSONObject jHerba = new JSONObject();
         try {
             jHerba.put(JSONKey.Name.key, name);
             jHerba.put(JSONKey.Weight.key, weight);
-            jHerba.put(JSONKey.Volume.key, volume);
+            jHerba.put(JSONKey.DryFactor.key, dryFactor);
+            jHerba.put(JSONKey.DryTime.key, dryTime);
+            jHerba.put(JSONKey.VolumeFactor.key, volumeFactor);
             jHerba.put(JSONKey.LatinName.key, latinName == null ? "" : latinName);
             jHerba.put(JSONKey.Type.key, type.name());
             jHerba.put(JSONKey.ImageURL.key, imageUrl == null ? "" : imageUrl);
-            jHerba.put(JSONKey.Description.key, description == null ? "" : description);
+//            jHerba.put(JSONKey.Description.key, description == null ? "" : description);
             JSONArray ts = new JSONArray();
-            for (Map.Entry<Date, int[]> entry : weightStamps.entrySet()) {
+            for (Map.Entry<Date, Integer> entry : weightStamps.entrySet()) {
                 JSONObject jEntry = new JSONObject();
-                jEntry.put(JSONKey.Weight.key, entry.getValue()[0]);
-                jEntry.put(JSONKey.Volume.key, entry.getValue()[1]);
+                jEntry.put(JSONKey.Weight.key, entry.getValue());
                 jEntry.put(JSONKey.Date.key, Time.dateFormat.format(entry.getKey()));
                 ts.put(jEntry);
             }
@@ -123,8 +154,6 @@ public class Herb implements JSONSerializable {
         }
         return jHerba;
     }
-
-
 
     public static void writeToPreferences(Context context) {
         JSONArray userHerbas = new JSONArray();
@@ -156,9 +185,9 @@ public class Herb implements JSONSerializable {
         }
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+//    public void setDescription(String description) {
+//        this.description = description;
+//    }
 
     public void setImageURL(String imageURL) {
         this.imageUrl = imageURL;
@@ -166,9 +195,15 @@ public class Herb implements JSONSerializable {
 
     public static void addToOwnHerbs(Herb herb) {
         if (ownHerbs.contains(herb)) {
-            ownHerbs.get(ownHerbs.indexOf(herb)).add(herb.weight, herb.volume);
+            ownHerbs.get(ownHerbs.indexOf(herb)).add(herb.weight);
         } else {
             ownHerbs.add(herb);
+        }
+    }
+
+    public static void removeFromOwnHerbs(Herb herb, Date date) {
+        if (ownHerbs.contains(herb)) {
+            ownHerbs.get(ownHerbs.indexOf(herb)).add(-herb.weight(), date);
         }
     }
 
@@ -180,6 +215,14 @@ public class Herb implements JSONSerializable {
         return name;
     }
 
+    public double dryTime() {
+        return dryTime;
+    }
+
+    public double dryFactor() {
+        return dryFactor;
+    }
+
     public String latin() {
         return latinName;
     }
@@ -188,12 +231,12 @@ public class Herb implements JSONSerializable {
         return weight;
     }
 
-    public double volume() {
-        return volume;
+    public double volumeFactor() {
+        return volumeFactor;
     }
 
     public String volumeString() {
-        return String.format("%.2f", (double)volume / 1000);
+        return String.format("%.2f", (double) weight * volumeFactor);
     }
 
     public String imageURL() {
@@ -212,9 +255,9 @@ public class Herb implements JSONSerializable {
         this.latinName = latinName;
     }
 
-    private String description() {
-        return description;
-    }
+//    public String description() {
+//        return description;
+//    }
 
     @Override
     public int hashCode() {
@@ -244,16 +287,27 @@ public class Herb implements JSONSerializable {
         return null;
     }
 
+    public void setWeight(int weight) {
+        this.weight = weight;
+        addTimeStamp(weight);
+    }
+
+    public void setVolumeFactor(double volumeFactor) {
+        this.volumeFactor = volumeFactor;
+    }
+
     private enum JSONKey {
 
         Name        ("name"),
         LatinName   ("latin_name"),
         Weight      ("weight"),
-        Volume      ("volume"),
+        VolumeFactor("volume_factor"),
         WeightStamps("weight_stamp"),
         Type        ("type"),
         ImageURL    ("image_url"),
         Date        ("date"),
+        DryTime     ("dry_time"),
+        DryFactor   ("dry_factor"),
         Description ("description");
 
         private final String key;
