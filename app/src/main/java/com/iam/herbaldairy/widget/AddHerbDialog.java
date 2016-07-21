@@ -238,7 +238,7 @@ public class AddHerbDialog extends RelativeLayout {
     }
 
     private String latinNameFromHTML(Document doc) {
-        return doc.select("div.mw-content-ltr p i span[lang=la]").get(0).text().toUpperCase();
+        return doc.select("div.mw-content-ltr p i span[lang=la]").get(0).text();
     }
 
     public enum From {

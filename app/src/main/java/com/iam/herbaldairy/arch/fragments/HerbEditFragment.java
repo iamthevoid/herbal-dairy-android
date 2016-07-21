@@ -1,32 +1,39 @@
 package com.iam.herbaldairy.arch.fragments;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.ListPopupWindow;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.iam.herbaldairy.R;
+import com.iam.herbaldairy.Web;
 import com.iam.herbaldairy.entities.Herb;
 import com.iam.herbaldairy.entities.Type;
-import com.iam.herbaldairy.widget.AddHerbDialog;
 import com.iam.herbaldairy.widget.Header;
 import com.iam.herbaldairy.widget.assets.svg;
 import com.iam.herbaldairy.widget.text.Text;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 public class HerbEditFragment extends Fragment implements Header.HeaderManipulation {
 
-    Herb herb;
+    public Herb herb;
 
     View view;
 
@@ -37,6 +44,8 @@ public class HerbEditFragment extends Fragment implements Header.HeaderManipulat
     EditText dryTime;
     EditText dryFactor;
     ImageView icon;
+
+    Button reload;
 
     LinearLayout selectTypeButton;
 
@@ -56,6 +65,13 @@ public class HerbEditFragment extends Fragment implements Header.HeaderManipulat
 
         herb = Herb.list().get(getArguments().getInt(getString(R.string.herb_to_edit)));
 
+        reload = (Button) view.findViewById(R.id.reload);
+        reload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadDataFromWiki(herb.name());
+            }
+        });
         icon = (ImageView) view.findViewById(R.id.icon);
         icon.setImageDrawable(svg.down.drawable());
         name = (Text) view.findViewById(R.id.title);
@@ -143,6 +159,45 @@ public class HerbEditFragment extends Fragment implements Header.HeaderManipulat
                 Herb.writeToPreferences(getContext());
             }
         };
+    }
+
+    public void loadDataFromWiki(final String herb) {
+        new AsyncTask<Void, Void, String>(){
+            @Override
+            protected void onPreExecute() {
+            }
+
+            @Override
+            protected String doInBackground(Void[] objects) {
+
+                String herbUrl = null;
+                try {
+                    herbUrl = URLEncoder.encode(herb.replaceAll(" ", "_"), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                return Web.GET(Web.url.wikipediaRu + herbUrl, null);
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                Document doc = Jsoup.parse(s);
+                String imageUrl = imageSrcFromHTML(doc);
+                String lat = latinNameFromHTML(doc);
+                HerbEditFragment.this.herb.setImageURL(imageUrl);
+                HerbEditFragment.this.herb.setLatinName(lat);
+
+            }
+        }.execute();
+    }
+
+    @NonNull
+    private String imageSrcFromHTML(Document doc) {
+        return "https:" + doc.select("table[class=infobox] a[class=image] img").attr("src");
+    }
+
+    private String latinNameFromHTML(Document doc) {
+        return doc.select("div.mw-content-ltr p i span[lang=la]").get(0).text();
     }
 
     @Override

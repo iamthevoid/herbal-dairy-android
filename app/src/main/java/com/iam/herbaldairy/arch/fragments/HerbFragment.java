@@ -20,10 +20,12 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.iam.herbaldairy.R;
 import com.iam.herbaldairy.entities.Herb;
+import com.iam.herbaldairy.widget.Divider;
 import com.iam.herbaldairy.widget.Header;
 import com.iam.herbaldairy.widget.AddHerbDialog;
 import com.iam.herbaldairy.widget.assets.svg;
 import com.iam.herbaldairy.widget.text.Text;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -42,6 +44,7 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = (RecyclerView) inflater.inflate(R.layout.recycler_fragment, container, false);
+        view.addItemDecoration(new Divider(getContext(), R.drawable.gray_divider, new int[]{}, new int[]{0,0}));
         dialog = new AddHerbDialog(getActivity());
 
         this.container = ((AddHerbDialog.Container)getActivity());
@@ -93,7 +96,7 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
 
         class HerbaVH extends RecyclerView.ViewHolder {
 
-            Text edit;
+            ImageView edit;
             Text title;
             Text latin;
             Text weight;
@@ -103,7 +106,8 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
 
             HerbaVH(View view) {
                 super(view);
-                edit = (Text) view.findViewById(R.id.edit);
+                edit = (ImageView) view.findViewById(R.id.edit);
+                edit.setImageDrawable(svg.settings.drawable());
                 title = (Text) view.findViewById(R.id.title);
                 latin = (Text) view.findViewById(R.id.latin);
                 weight = (Text) view.findViewById(R.id.weight);
@@ -116,9 +120,10 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
                 Herb herb = Herb.list().get(position);
                 title.setText(herb.name());
                 latin.setText(herb.latin());
-                weight.setText(herb.weight() + "g.");
+                weight.setText(herb.weight() + "g");
                 volume.setText(herb.volumeString() + "l");
-                type.setText(" (" + herb.typeString() + ")");
+                type.setText(herb.typeString());
+                Log.d("imageUrl", herb.imageURL() + "fd");
                 Glide.with(getContext())
                         .load(herb.imageURL())
                         .centerCrop()

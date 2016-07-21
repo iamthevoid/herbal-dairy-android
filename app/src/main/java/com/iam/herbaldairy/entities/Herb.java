@@ -57,6 +57,9 @@ public class Herb implements JSONSerializable {
             dryFactor  = jHerba.getDouble(JSONKey.DryFactor.key);
             dryTime  = jHerba.getDouble(JSONKey.DryTime.key);
             imageUrl  = jHerba.getString(JSONKey.ImageURL.key);
+            Log.d("rimageUrl", jHerba.getString(JSONKey.ImageURL.key));
+            Log.d("rimageUrl", JSONKey.ImageURL.key);
+
             JSONArray ts = jHerba.getJSONArray(JSONKey.WeightStamps.key);
 
             final Date now = new Date(System.currentTimeMillis());
@@ -149,6 +152,9 @@ public class Herb implements JSONSerializable {
                 ts.put(jEntry);
             }
             jHerba.put(JSONKey.WeightStamps.key, ts);
+            Log.d("wimageUrl", jHerba.getString(JSONKey.ImageURL.key));
+            Log.d("wimageUrl", JSONKey.ImageURL.key);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

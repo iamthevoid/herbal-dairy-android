@@ -4,6 +4,10 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
+    <color name="herb_quantity_gray">#777777</color>
+    <color name="main_background">#ebedf8</color>
+    <color name="header_background">#0ccb25</color>
+
     <color name="lavka_red">#a21d20</color>
     <color name="black">#000000</color>
     <color name="almost_black">#1C1C1C</color>
