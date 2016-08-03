@@ -15,17 +15,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.iam.herbaldairy.R;
 import com.iam.herbaldairy.entities.Herb;
+import com.iam.herbaldairy.widget.AddHerbDialog;
 import com.iam.herbaldairy.widget.Divider;
 import com.iam.herbaldairy.widget.Header;
-import com.iam.herbaldairy.widget.AddHerbDialog;
 import com.iam.herbaldairy.widget.assets.svg;
 import com.iam.herbaldairy.widget.text.Text;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -97,6 +97,7 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
         class HerbaVH extends RecyclerView.ViewHolder {
 
             ImageView edit;
+            FrameLayout settingsButton;
             Text title;
             Text latin;
             Text weight;
@@ -106,6 +107,7 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
 
             HerbaVH(View view) {
                 super(view);
+                settingsButton = (FrameLayout) view.findViewById(R.id.setbutton);
                 edit = (ImageView) view.findViewById(R.id.edit);
                 edit.setImageDrawable(svg.settings.drawable());
                 title = (Text) view.findViewById(R.id.title);
@@ -128,13 +130,11 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
                         .load(herb.imageURL())
                         .centerCrop()
                         .into(image);
-                edit.setOnClickListener(new View.OnClickListener() {
+                settingsButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Fragment fragment = new HerbEditFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putInt(getString(R.string.herb_to_edit), position);
-                        fragment.setArguments(bundle);
+                        HerbEditFragment fragment = new HerbEditFragment();
+                        fragment.setHerb(Herb.list().get(position));
                         FragmentManager fm = getActivity().getSupportFragmentManager();
                         FragmentTransaction ft = fm.beginTransaction();
                         ft
@@ -149,7 +149,14 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
     }
 
     @Override
-    public void reloadData(Herb herb) {
+    public void onSave(Herb herb) {
+        int position = Herb.list().indexOf(herb);
+        RecyclerView.Adapter adapter = view.getAdapter();
+        adapter.notifyItemChanged(position);
+    }
+
+    @Override
+    public void onClose() {
         RecyclerView.Adapter adapter = view.getAdapter();
         adapter.notifyDataSetChanged();
     }
@@ -189,25 +196,28 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addHerbLpw.setAdapter(adapter);
-                addHerbLpw.setWidth(400);
-                addHerbLpw.setHeight(500);
-                addHerbLpw.setAnchorView(view);
-                addHerbLpw.setModal(true);
-                addHerbLpw.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        if (Herb.containsHerbName(herbs[i])) {
-                            dialog.setHerb(Herb.herbByName(herbs[i]), AddHerbDialog.From.HerbFragmentByHerb);
-                        }
-                        dialog.setHerb(herbs[i], AddHerbDialog.From.HerbFragmentByName);
-                        dialog.setDataReloader(HerbFragment.this);
-                        Log.d("onItemClick", herbs[i]);
-                        container.addView(dialog);
-                        addHerbLpw.dismiss();
-                    }
-                });
-                addHerbLpw.show();
+
+                ((Header.SearchInHeader)getActivity()).switchSearch();
+
+//                addHerbLpw.setAdapter(adapter);
+//                addHerbLpw.setWidth(280);
+//                addHerbLpw.setHeight(500);
+//                addHerbLpw.setAnchorView(view);
+//                addHerbLpw.setModal(true);
+//                addHerbLpw.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                    @Override
+//                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                        if (Herb.containsHerbName(herbs[i])) {
+//                            dialog.setHerb(Herb.herbByName(herbs[i]), AddHerbDialog.From.HerbFragmentByHerb);
+//                        }
+//                        dialog.setHerb(herbs[i], AddHerbDialog.From.HerbFragmentByName);
+//                        dialog.setDataReloader(HerbFragment.this);
+//                        Log.d("onItemClick", herbs[i]);
+//                        container.addView(dialog);
+//                        addHerbLpw.dismiss();
+//                    }
+//                });
+//                addHerbLpw.show();
             }
         };
     }
@@ -224,7 +234,7 @@ public class HerbFragment extends Fragment implements Header.HeaderManipulation,
 
     @Override
     public String headerTitle() {
-        return "HERBS";
+        return "Herbs";
     }
 
     @Override

@@ -1,7 +1,9 @@
 <resources>
-    <string name="app_name">HerbalDairy</string>
+    <string name="app_name">HerbDairy</string>
     <string name="own_herbas">owfmfkmrembn_hfertsdbfs</string>
     <string name="own_absinthes">owfmfkmrembn_akfdbasbirjkntkl_-es</string>
+    <string name="edit_absinth_open_for">edit_absinthe_open_for</string>
+    <string name="edit_absinth_position">edit_absinthe_position</string>
     <string name="herb_to_edit">gkldfglkdfngdherdfb-toedkfdfgites</string>
     <string name="finish_dates">fhjninsfferislkfgh_fdfaltlles</string>
     <string name="finish_dates_sp">fhjninsfferislkfgh_sssssppp_fdfaltlles</string>

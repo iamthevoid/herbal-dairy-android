@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.iam.herbaldairy.R;
 import com.iam.herbaldairy.Time;
 import com.iam.herbaldairy.arch.InfusionTickerService;
@@ -29,18 +30,23 @@ import com.iam.herbaldairy.arch.fragments.HerbFragment;
 import com.iam.herbaldairy.entities.Absinth;
 import com.iam.herbaldairy.entities.Herb;
 import com.iam.herbaldairy.widget.Decorator;
+import com.iam.herbaldairy.widget.Divider;
 import com.iam.herbaldairy.widget.Header;
 import com.iam.herbaldairy.widget.AddHerbDialog;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class DrawerActivity extends AppCompatActivity implements DrawerCallbacks,
+public class DrawerActivity extends AppCompatActivity implements DrawerAdapter.DrawerCallbacks,
         Header.FragmentDataSender,
         Header.ToggleClicker,
+        Header.SearchInHeader,
+        ProgressBarHolder,
         AddHerbDialog.Container {
 
     Header header;
+
+    CircularProgressView progressBar;
 
     RecyclerView mRecyclerView;
     RecyclerView.Adapter mAdapter;
@@ -77,6 +83,8 @@ public class DrawerActivity extends AppCompatActivity implements DrawerCallbacks
 
         dialogContainer = (FrameLayout) findViewById(R.id.dialogContainer);
 
+        progressBar = (CircularProgressView) findViewById(R.id.progressBar);
+
         backround = (ImageView) findViewById(R.id.background);
         backround.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
@@ -84,7 +92,7 @@ public class DrawerActivity extends AppCompatActivity implements DrawerCallbacks
 //
 
         drawerHolder = (LinearLayout) findViewById(R.id.drawer);
-        drawerHolder.getLayoutParams().width = Decorator.getWidthBasedOnIPhone640(544);
+//        drawerHolder.getLayoutParams().width = Decorator.getWidthBasedOnIPhone640(544);
 
         Drawer = (DrawerLayout) findViewById(R.id.DrawerLayout);
         ViewTreeObserver vto = Drawer.getViewTreeObserver();
@@ -103,12 +111,13 @@ public class DrawerActivity extends AppCompatActivity implements DrawerCallbacks
 
         header = (Header) findViewById(R.id.actionBar);
         header.bringToFront();
-        Decorator.setRectSize(header, 640, 89);
+//        Decorator.setRectSize(header, 640, 89);
 
         mAdapter = new DrawerAdapter();
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView = (RecyclerView) findViewById(R.id.RecyclerView);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.addItemDecoration(new Divider(this, R.drawable.black_divider, new int[]{}, new int[]{0,0}));
         mRecyclerView.setAdapter(mAdapter);
 
         mDrawerToggle = new ActionBarDrawerToggle(
@@ -250,5 +259,20 @@ public class DrawerActivity extends AppCompatActivity implements DrawerCallbacks
     private void restoreUserData() {
         Herb.readFromPreferences(getApplicationContext());
         Absinth.readFromPreferences(getApplicationContext());
+    }
+
+    @Override
+    public void switchSearch() {
+        header.switchSearch();
+    }
+
+    @Override
+    public void showProgres() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgress() {
+        progressBar.setVisibility(View.INVISIBLE);
     }
 }

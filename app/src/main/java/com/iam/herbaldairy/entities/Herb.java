@@ -2,7 +2,6 @@ package com.iam.herbaldairy.entities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.iam.herbaldairy.R;
 import com.iam.herbaldairy.Time;
@@ -29,8 +28,11 @@ public class Herb implements JSONSerializable {
     private double                  volumeFactor;
     private double                  dryFactor;
     private double                  dryTime;
-    private TreeMap<Date, Integer>    weightStamps;
-    private Type type;
+    private TreeMap<Date, Integer>  weightStamps;
+    private Type                    type;
+    private String                  cultivateDescription;
+    private String                  gatherPeriod;
+    private String                  description;
 
     private String                  imageUrl;
 //    private String                  description;
@@ -49,16 +51,17 @@ public class Herb implements JSONSerializable {
     public Herb(JSONObject jHerba) {
         weightStamps = new TreeMap<>();
         try {
-            name  = jHerba.getString(JSONKey.Name.key);
-            weight  = jHerba.getInt(JSONKey.Weight.key);
-            volumeFactor = jHerba.getDouble(JSONKey.VolumeFactor.key);
-            type  = Type.valueOf(jHerba.getString(JSONKey.Type.key));
-            latinName  = jHerba.getString(JSONKey.LatinName.key);
-            dryFactor  = jHerba.getDouble(JSONKey.DryFactor.key);
-            dryTime  = jHerba.getDouble(JSONKey.DryTime.key);
-            imageUrl  = jHerba.getString(JSONKey.ImageURL.key);
-            Log.d("rimageUrl", jHerba.getString(JSONKey.ImageURL.key));
-            Log.d("rimageUrl", JSONKey.ImageURL.key);
+            if (jHerba.has(JSONKey.Name.key)) name  = jHerba.getString(JSONKey.Name.key);
+            if (jHerba.has(JSONKey.Description.key)) description  = jHerba.getString(JSONKey.Description.key);
+            if (jHerba.has(JSONKey.CultivateDescription.key)) cultivateDescription  = jHerba.getString(JSONKey.CultivateDescription.key);
+            if (jHerba.has(JSONKey.GatherPeriod.key)) gatherPeriod  = jHerba.getString(JSONKey.GatherPeriod.key);
+            if (jHerba.has(JSONKey.Weight.key)) weight  = jHerba.getInt(JSONKey.Weight.key);
+            if (jHerba.has(JSONKey.VolumeFactor.key)) volumeFactor = jHerba.getDouble(JSONKey.VolumeFactor.key);
+            if (jHerba.has(JSONKey.Type.key)) type  = Type.valueOf(jHerba.getString(JSONKey.Type.key));
+            if (jHerba.has(JSONKey.LatinName.key)) latinName  = jHerba.getString(JSONKey.LatinName.key);
+            if (jHerba.has(JSONKey.DryFactor.key)) dryFactor  = jHerba.getDouble(JSONKey.DryFactor.key);
+            if (jHerba.has(JSONKey.DryTime.key)) dryTime  = jHerba.getDouble(JSONKey.DryTime.key);
+            if (jHerba.has(JSONKey.ImageURL.key)) imageUrl  = jHerba.getString(JSONKey.ImageURL.key);
 
             JSONArray ts = jHerba.getJSONArray(JSONKey.WeightStamps.key);
 
@@ -67,7 +70,7 @@ public class Herb implements JSONSerializable {
                 JSONObject jEntry = ts.getJSONObject(i);
                 Date date = now;
                 try {
-                    date = Time.dateFormat.parse(jEntry.getString(JSONKey.Date.key));
+                    if (jHerba.has(JSONKey.Date.key)) date = Time.dateFormat.parse(jEntry.getString(JSONKey.Date.key));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -82,9 +85,10 @@ public class Herb implements JSONSerializable {
     public Herb(Herb herb) {
         this.name = herb.name();
         this.weight = 0;
-        this.volumeFactor = 0;
-        this.dryFactor = 0;
-        this.dryTime = 0;
+        this.type = herb.type();
+        this.volumeFactor = herb.volumeFactor();
+        this.dryFactor = herb.dryFactor();
+        this.dryTime = herb.dryTime();
         this.latinName = herb.latinName;
         this.imageUrl = herb.imageURL();
 //        this.description = herb.description();
@@ -136,6 +140,9 @@ public class Herb implements JSONSerializable {
         JSONObject jHerba = new JSONObject();
         try {
             jHerba.put(JSONKey.Name.key, name);
+            jHerba.put(JSONKey.CultivateDescription.key, cultivateDescription == null ? "" : cultivateDescription);
+            jHerba.put(JSONKey.GatherPeriod.key, gatherPeriod == null ? "" : gatherPeriod);
+            jHerba.put(JSONKey.Description.key, description == null ? "" : description);
             jHerba.put(JSONKey.Weight.key, weight);
             jHerba.put(JSONKey.DryFactor.key, dryFactor);
             jHerba.put(JSONKey.DryTime.key, dryTime);
@@ -152,8 +159,6 @@ public class Herb implements JSONSerializable {
                 ts.put(jEntry);
             }
             jHerba.put(JSONKey.WeightStamps.key, ts);
-            Log.d("wimageUrl", jHerba.getString(JSONKey.ImageURL.key));
-            Log.d("wimageUrl", JSONKey.ImageURL.key);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -190,10 +195,6 @@ public class Herb implements JSONSerializable {
             }
         }
     }
-
-//    public void setDescription(String description) {
-//        this.description = description;
-//    }
 
     public void setImageURL(String imageURL) {
         this.imageUrl = imageURL;
@@ -242,7 +243,7 @@ public class Herb implements JSONSerializable {
     }
 
     public String volumeString() {
-        return String.format("%.2f", (double) weight * volumeFactor);
+        return String.format("%.2f", (double) weight * volumeFactor / 1000);
     }
 
     public String imageURL() {
@@ -284,6 +285,17 @@ public class Herb implements JSONSerializable {
         return false;
     }
 
+    public static ArrayList<Herb> herbsByName(String name) {
+        ArrayList<Herb> h = new ArrayList<>();
+        for (Herb herb : ownHerbs) {
+            if (herb.name.equals(name)) {
+                h.add(herb);
+            }
+        }
+
+        return h;
+    }
+
     public static Herb herbByName(String herbName) {
         for (Herb herb : ownHerbs) {
             if (herb.name().equals(herbName)) {
@@ -291,6 +303,15 @@ public class Herb implements JSONSerializable {
             }
         }
         return null;
+    }
+
+    public static Herb herbByHerb(Herb herb) {
+        for (Herb h : ownHerbs) {
+            if (h.equals(herb)) {
+                return h;
+            }
+        }
+        throw new RuntimeException("You have not " + herb.type().name() + " of herb " + herb.name());
     }
 
     public void setWeight(int weight) {
@@ -304,22 +325,50 @@ public class Herb implements JSONSerializable {
 
     private enum JSONKey {
 
-        Name        ("name"),
-        LatinName   ("latin_name"),
-        Weight      ("weight"),
-        VolumeFactor("volume_factor"),
-        WeightStamps("weight_stamp"),
-        Type        ("type"),
-        ImageURL    ("image_url"),
-        Date        ("date"),
-        DryTime     ("dry_time"),
-        DryFactor   ("dry_factor"),
-        Description ("description");
+        Name                ("name"),
+        LatinName           ("latin_name"),
+        Weight              ("weight"),
+        VolumeFactor        ("volume_factor"),
+        WeightStamps        ("weight_stamp"),
+        Type                ("type"),
+        ImageURL            ("image_url"),
+        Date                ("date"),
+        DryTime             ("dry_time"),
+        DryFactor           ("dry_factor"),
+        CultivateDescription("cultivate_description"),
+        GatherPeriod        ("gather_period"),
+        Description         ("description");
 
         private final String key;
 
         JSONKey(String key) {
             this.key = key;
+        }
+    }
+
+    public static String volumesStringForHerbs(ArrayList<Herb> herbs) {
+        final int size = herbs.size();
+        if (size > 0) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("( ");
+            if (size == 1) {
+                final Herb herb = herbs.get(0);
+                sb.append(herb.type().name().subSequence(0,2));
+                sb.append(". ");
+                sb.append(herb.weight + "g");
+            } else {
+                for (int i = 0; i < size; i++) {
+                    final Herb herb = herbs.get(i);
+                    sb.append(herb.type().name().subSequence(0,2));
+                    sb.append(". ");
+                    sb.append(herb.weight + "g");
+                    if (i != size - 1) sb.append(", ");
+                }
+            }
+            sb.append(" )");
+            return sb.toString();
+        } else {
+            return "";
         }
     }
 }

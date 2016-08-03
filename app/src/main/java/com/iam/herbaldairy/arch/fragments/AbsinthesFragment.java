@@ -10,19 +10,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
+import com.iam.herbaldairy.DeleteGestureDetector;
 import com.iam.herbaldairy.R;
 import com.iam.herbaldairy.Time;
 import com.iam.herbaldairy.entities.Absinth;
 import com.iam.herbaldairy.widget.Header;
-import com.iam.herbaldairy.widget.AddHerbDialog;
 import com.iam.herbaldairy.widget.assets.svg;
 import com.iam.herbaldairy.widget.text.Text;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 public class AbsinthesFragment extends Fragment implements Header.HeaderManipulation {
@@ -103,14 +109,22 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager manager = ((AppCompatActivity)getContext()).getSupportFragmentManager();
-                FragmentTransaction transaction = manager.beginTransaction();
-                transaction
-                        .replace(R.id.container, new AddAbsinthFragment(), AddAbsinthFragment.class.getCanonicalName())
-                        .setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .commit();
+                Bundle bundle = new Bundle();
+                bundle.putString(getString(R.string.edit_absinth_open_for), AddAbsinthFragment.OpenFor.Add.name());
+                showEditAbsintheFragment(bundle);
             }
         };
+    }
+
+    private void showEditAbsintheFragment(Bundle bundle) {
+        FragmentManager manager = ((AppCompatActivity)getContext()).getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        AddAbsinthFragment fragment = new AddAbsinthFragment();
+        fragment.setArguments(bundle);
+        transaction
+                .replace(R.id.container, fragment, AddAbsinthFragment.class.getCanonicalName())
+                .setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
     }
 
     @Override
@@ -125,7 +139,7 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
 
     @Override
     public String headerTitle() {
-        return "ABSINTHES";
+        return "Absinthes";
     }
 
     @Override
@@ -148,7 +162,7 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
 
         @Override
         public void onBindViewHolder(AbsintheVH holder, int position) {
-            holder.onBind(Absinth.absinthes.get(position));
+            holder.onBind(position);
         }
 
         @Override
@@ -157,27 +171,76 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
             return Absinth.absinthes.size();
         }
 
-        public class AbsintheVH extends RecyclerView.ViewHolder {
+        public class AbsintheVH extends RecyclerView.ViewHolder implements View.OnTouchListener {
+
+            protected GestureDetector detector;
 
             private Text date;
             private Text volume;
             private Text interval;
             private Text stage;
 
+            private ImageView editIcon;
+            private FrameLayout editButton;
+
+            private RelativeLayout mainHolder;
+            private FrameLayout deleteButton;
+            private ImageView deleteIcon;
+
             public AbsintheVH(View itemView) {
                 super(itemView);
+                editIcon = (ImageView) itemView.findViewById(R.id.edit);
+                editIcon.setImageDrawable(svg.settings.drawable());
+                editButton = (FrameLayout) itemView.findViewById(R.id.setbutton);
+
+                mainHolder = (RelativeLayout) itemView.findViewById(R.id.mainholder);
+                mainHolder.setOnTouchListener(this);
+                deleteButton = (FrameLayout) itemView.findViewById(R.id.delete);
+                deleteIcon = (ImageView) itemView.findViewById(R.id.deleteicon);
+                deleteIcon.setImageDrawable(svg.xwhite.drawable());
                 date = (Text) itemView.findViewById(R.id.date);
                 volume = (Text) itemView.findViewById(R.id.volume);
                 interval = (Text) itemView.findViewById(R.id.interval);
                 stage = (Text) itemView.findViewById(R.id.stage);
+                detector = new GestureDetector(
+                        itemView.getContext(),
+                        new DeleteGestureDetector(itemView.getContext(), mainHolder, deleteButton)
+                );
+                mainHolder.bringToFront();
             }
 
-            public void onBind(Absinth absinth) {
+            public void onBind(final int position) {
+                final Absinth absinth = Absinth.absinthes.get(position);
                 final Date idate = absinth.startInfuseDate();
+                deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int pos = Absinth.absinthes().indexOf(absinth);
+                        Absinth.remove(absinth, getContext());
+                        AbsintheAdapter.this.notifyDataSetChanged();
+                    }
+                });
+
+                editButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString(getString(R.string.edit_absinth_open_for), AddAbsinthFragment.OpenFor.Edit.name());
+                        bundle.putInt(getString(R.string.edit_absinth_position), position);
+                        showEditAbsintheFragment(bundle);
+                    }
+                });
+
                 this.date.setText(Time.monthDay(idate) + " " + Time.monthName(idate) + ", " + Time.year(idate));
                 volume.setText((!absinth.isDone() ? absinth.spiritVolume() : absinth.resultVolume()) + "l");
                 interval.setText(absinth.getInfuseInterval() < 21 ? (absinth.getInfuseInterval() + "d") : ((absinth.getInfuseInterval() / 7) + "w"));
                 stage.setText(absinth.stage().toString());
+            }
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                detector.onTouchEvent(event);
+                return true;
             }
         }
     }

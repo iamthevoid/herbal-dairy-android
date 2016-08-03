@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.ListPopupWindow;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,9 +62,9 @@ public class HerbEditFragment extends Fragment implements Header.HeaderManipulat
 
         types = Type.names();
         lpw = new ListPopupWindow(getContext());
-        adapter = new ArrayAdapter<String>(getContext(), R.layout.popup_item, types);
+        adapter = new ArrayAdapter<>(getContext(), R.layout.popup_item, types);
 
-        herb = Herb.list().get(getArguments().getInt(getString(R.string.herb_to_edit)));
+//        herb = Herb.list().get(getArguments().getInt(getString(R.string.herb_to_edit)));
 
         reload = (Button) view.findViewById(R.id.reload);
         reload.setOnClickListener(new View.OnClickListener() {
@@ -110,6 +111,10 @@ public class HerbEditFragment extends Fragment implements Header.HeaderManipulat
         return view;
     }
 
+    public void setHerb(Herb herb) {
+        this.herb = herb;
+    }
+
     @Override
     public svg leftIcon() {
         return svg.toggle;
@@ -151,6 +156,8 @@ public class HerbEditFragment extends Fragment implements Header.HeaderManipulat
                 herb.setType(Type.valueOf(type.getText().toString().toLowerCase()));
                 herb.setWeight(Integer.parseInt(weight.getText().toString()));
                 herb.setVolumeFactor(Double.parseDouble(volumeFactor.getText().toString()));
+
+                Log.d("weight", herb.weight() + "");
 
                 FragmentManager fm = getActivity().getSupportFragmentManager();
 

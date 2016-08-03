@@ -131,6 +131,7 @@ public class AddHerbDialog extends RelativeLayout {
                             herb.add(getIntFromField(weightET));
                             break;
                     }
+                    hasDataToReload.onSave(herb);
                     close();
                 } else {
                     Toast.makeText(context, "Подождите окончания загрузки данных", Toast.LENGTH_SHORT).show();
@@ -141,6 +142,7 @@ public class AddHerbDialog extends RelativeLayout {
         closeDialogBTN.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("onClose", "onClose");
                 close();
             }
         });
@@ -158,7 +160,7 @@ public class AddHerbDialog extends RelativeLayout {
     }
 
     private void close() {
-        hasDataToReload.reloadData(herb);
+        hasDataToReload.onClose();
         ViewGroup viewGroup = (ViewGroup) this.getParent();
         viewGroup.removeAllViews();
     }
@@ -191,7 +193,8 @@ public class AddHerbDialog extends RelativeLayout {
     }
 
     public interface HasDataToReload {
-        void reloadData(Herb herb);
+        void onSave(Herb herb);
+        void onClose();
     }
 
     public void loadDataFromWiki(final String herb) {

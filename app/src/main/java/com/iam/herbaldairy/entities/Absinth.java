@@ -42,7 +42,7 @@ public class Absinth implements JSONSerializable {
         this.herbs = herbs;
         for (Herb herb : herbs) {
             if (Herb.containsHerbName(herb.name())) {
-                Herb.herbByName(herb.name()).add(-herb.weight(), startInfuseDate);
+                Herb.herbByHerb(herb).add(-herb.weight(), startInfuseDate);
             }
         }
     }
@@ -190,6 +190,68 @@ public class Absinth implements JSONSerializable {
     public static void add(Absinth absinth) {
         System.out.println("absinthe " + !absinthes.contains(absinth));
         if (!absinthes.contains(absinth)) { absinthes.add(absinth); }
+    }
+
+    public static void remove(Absinth absinth, Context context) {
+        ArrayList<Herb> herbs = absinth.herbs;
+        for (Herb herb : herbs) {
+            if (Herb.list().contains(herb)) {
+                Herb.list().get(Herb.list().indexOf(herb)).add(herb.weight());
+            }
+        }
+
+        absinthes.remove(absinth);
+        Absinth.writeToPreferences(context);
+    }
+
+    public ArrayList<Herb> herbs() {
+        return herbs;
+    }
+
+    public void validateHerbs(ArrayList<Herb> herbs, ArrayList<Herb> newHerbs) {
+        for (Herb herb : herbs) {
+            if (this.herbs.contains(herb)) {
+                final Herb ownHerbAnalogOfChanging = this.herbs.get(this.herbs.indexOf(herb));
+                if (ownHerbAnalogOfChanging.weight() != herb.weight()) {
+                    int weight = herb.weight() - ownHerbAnalogOfChanging.weight();
+                    Herb.herbByHerb(herb).add(-weight);
+                    ownHerbAnalogOfChanging.setWeight(herb.weight());
+                }
+            } else {
+                this.herbs.remove(herb);
+            }
+        }
+
+        for (Herb herb : newHerbs) {
+            if (!this.herbs.contains(herb)) {
+                this.herbs.add(herb);
+                Herb.herbByHerb(herb).add(-herb.weight());
+            }
+        }
+    }
+
+    public Date distillDate() {
+        return distillDate;
+    }
+
+    public int alcPercent() {
+        return alcPercent;
+    }
+
+    public int distillTemperature() {
+        return distillTemperature;
+    }
+
+    public String comment() {
+        return comment;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startInfuseDate = startDate;
+    }
+
+    public void setSpiritVolume(double spiritVolume) {
+        this.spiritVolume = spiritVolume;
     }
 
     private enum JSONKey {

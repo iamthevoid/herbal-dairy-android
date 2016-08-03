@@ -19,6 +19,13 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_margin="2dp" />
+
+    <FrameLayout
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:id="@+id/setbutton"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true" />
     <com.iam.herbaldairy.widget.text.Text
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

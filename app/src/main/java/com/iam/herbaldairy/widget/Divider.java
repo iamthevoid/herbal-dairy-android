@@ -34,7 +34,7 @@ public class Divider extends RecyclerView.ItemDecoration {
             return;
         }
 
-        mDivider = hide ? new ColorDrawable(Decorator.WHITE_TRANSPARENT_100) : context.getResources().getDrawable(R.drawable.gray_divider);
+        mDivider = hide ? new ColorDrawable(Decorator.WHITE_TRANSPARENT_100) : mDivider;
         final int left = parent.getPaddingLeft();
         final int right = parent.getWidth() - parent.getPaddingRight();
         final int[] childs = exclude(disabled, parent.getChildCount());

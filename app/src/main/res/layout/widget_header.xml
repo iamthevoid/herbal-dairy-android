@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/header_background">
 
     <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/lheader">
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:id="@+id/lheader"
+        android:padding="12dp">
 
         <ImageView
             android:layout_width="match_parent"
@@ -23,10 +25,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/titleHolder"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentRight="false"
         android:layout_toRightOf="@+id/lheader"
-        android:layout_toLeftOf="@+id/right_options"
-        android:layout_alignBottom="@+id/lheader"
-        android:layout_alignTop="@+id/lheader">
+        android:layout_toLeftOf="@+id/right_options">
 
         <com.iam.herbaldairy.widget.text.Text
             android:layout_width="match_parent"
@@ -44,18 +46,37 @@
             android:layout_alignParentBottom="true" />
     </RelativeLayout>
 
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/search_et"
+        android:hint="Search"
+        app:met_floatingLabelTextColor="@color/almost_black"
+        app:met_bottomTextSize="12sp"
+        app:met_primaryColor="@color/very_dark_green"
+        app:met_floatingLabel="none"
+        android:layerType="software"
+        android:textSize="14sp"
+        android:inputType="text"
+        app:met_floatingLabelTextSize="12sp"
+        android:layout_toLeftOf="@+id/right_options"
+        android:layout_toRightOf="@+id/lheader"
+        android:visibility="invisible" />
+
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="44dp"
         android:id="@+id/right_options"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/lheader"
-        android:layout_alignBottom="@+id/lheader">
+        android:layout_alignBottom="@+id/lheader"
+        android:layout_alignParentEnd="true">
 
         <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/rheader1">
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:id="@+id/rheader1"
+            android:padding="12dp">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -65,9 +86,10 @@
         </FrameLayout>
 
         <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/rheader2">
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:id="@+id/rheader2"
+            android:padding="12dp">
 
             <ImageView
                 android:layout_width="wrap_content"

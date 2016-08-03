@@ -5,6 +5,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -13,9 +15,17 @@ import com.iam.herbaldairy.R;
 import com.iam.herbaldairy.widget.assets.font;
 import com.iam.herbaldairy.widget.assets.svg;
 import com.iam.herbaldairy.widget.text.Text;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 
-public class Header extends RelativeLayout {
+public class Header extends RelativeLayout implements Animation.AnimationListener {
+
+    private Animation scale_search_animation;
+
+    private boolean searchMode = false;
+    private boolean animationInProgress = false;
+
+    private HeaderManipulation callbacks;
 
     private IconContainer leftSideImage;
 
@@ -29,6 +39,10 @@ public class Header extends RelativeLayout {
     private IconContainer rightIcon1;
     private IconContainer rightIcon2;
 
+    private RelativeLayout titleHolder;
+
+    private MaterialEditText search_et;
+
     public Header(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
         ((Activity)context).getLayoutInflater().inflate(R.layout.widget_header, this);
@@ -37,13 +51,16 @@ public class Header extends RelativeLayout {
     }
 
     private void findChildViews() {
+        scale_search_animation = AnimationUtils.loadAnimation(getContext(), R.anim.scale_view_out_to_left);
+        scale_search_animation.setAnimationListener(this);
+        titleHolder = (RelativeLayout) findViewById(R.id.titleHolder);
+
+        search_et = (MaterialEditText) findViewById(R.id.search_et);
+        search_et.setIconLeft(svg.search.drawable());
+
         leftSideImage = new IconContainer((FrameLayout) findViewById(R.id.lheader), R.id.left_action_image);
-        Decorator.setRectSizeAndPadding(leftSideImage.frameLayout, 110, 89, 32, 28, 38, 28);
-//        Decorator.setMargins(leftSideImage.imageView, 32, 28, 38, 28);
         rightIcon1 = new IconContainer((FrameLayout) findViewById(R.id.rheader1), R.id.right_action_image_1);
-        rightIcon1.changeSidePadding(28, 13);
         rightIcon2 = new IconContainer((FrameLayout) findViewById(R.id.rheader2), R.id.right_action_image_2);
-        rightIcon2.changeSidePadding(17, 8);
 
         shadow = (FrameLayout) findViewById(R.id.shadow);
 
@@ -51,9 +68,7 @@ public class Header extends RelativeLayout {
         title.setTextColor(Decorator.ACTION_BAR_TITLE_COLOR);
         subtitle = (Text)findViewById(R.id.subtitle);
         textButton = (Text) findViewById(R.id.right_text_button);
-        Decorator.setMargins(textButton, 14, 0, 3, 0);
         text_holder = (FrameLayout) findViewById(R.id.rholdert);
-        Decorator.setPadding(text_holder, 0, 0, 24, 0);
     }
 
     private void setLeftSideImage(HeaderManipulation callbacks) {
@@ -85,7 +100,7 @@ public class Header extends RelativeLayout {
             }
             title.setTypeface(font.font133sb.typeface());
             title.setVisibility(VISIBLE);
-            Decorator.setMargins(title, 0, 20, 0, 0);
+//            Decorator.setMargins(title, 0, 20, 0, 0);
             title.setTextSize(TypedValue.COMPLEX_UNIT_PX, Decorator.getHeightBasedOnIPhone960(24));
             if (titleText.length() > 20) {
                 titleText = titleText.subSequence(0, 19) + "...";
@@ -99,7 +114,7 @@ public class Header extends RelativeLayout {
                 params.addRule(ALIGN_TOP, R.id.lheader);
                 params.addRule(CENTER_HORIZONTAL, R.id.lheader);
                 title.setLayoutParams(params);
-                Decorator.setMargins(title, 0, 16, 0, 0);
+//                Decorator.setMargins(title, 0, 16, 0, 0);
             }
         } else {
             title.setVisibility(GONE);
@@ -110,7 +125,7 @@ public class Header extends RelativeLayout {
         String subtitleText = callbacks.headerSubtitle();
         if (subtitleText != null) {
             subtitle.setVisibility(VISIBLE);
-            Decorator.setMargins(subtitle, 0, 0, 0, 8);
+//            Decorator.setMargins(subtitle, 0, 0, 0, 8);
             subtitle.setTextColor(Decorator.ACTION_BAR_SUBTITLE_COLOR);
             subtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, Decorator.getHeightBasedOnIPhone960(20));
             subtitle.setText(subtitleText);
@@ -190,12 +205,68 @@ public class Header extends RelativeLayout {
     }
 
     public void decorateHeader(HeaderManipulation callbacks) {
+        this.callbacks = callbacks;
         setTitle(callbacks);
         setSubtitle(callbacks);
         setLeftSideImage(callbacks);
         setRightIcon1(callbacks);
         setRightIcon2(callbacks);
         setTextButton(callbacks);
+    }
+
+    public void switchSearch() {
+        if (searchMode && !animationInProgress)
+        {
+            disableSearch();
+//            searchMode = false;
+        }
+        else if (!searchMode && !animationInProgress)
+        {
+            enableSearch();
+//            searchMode = true;
+        }
+    }
+
+    private void disableSearch() {
+        titleHolder.setVisibility(VISIBLE);
+        search_et.startAnimation(scale_search_animation);
+    }
+
+    private void enableSearch() {
+        search_et.setVisibility(VISIBLE);
+
+        titleHolder.startAnimation(scale_search_animation);
+
+    }
+
+    @Override
+    public void onAnimationStart(Animation animation) {
+        animationInProgress = true;
+        if (searchMode) {
+            rightIcon2.setImageDrawable(callbacks.rightIcon2());
+        } else {
+            rightIcon2.setImageDrawable(svg.x);
+        }
+    }
+
+    @Override
+    public void onAnimationEnd(Animation animation) {
+        animationInProgress = false;
+        if (!searchMode) {
+            titleHolder.setVisibility(INVISIBLE);
+            search_et.setVisibility(VISIBLE);
+            searchMode = true;
+        }
+        else {
+            search_et.setVisibility(INVISIBLE);
+            titleHolder.setVisibility(VISIBLE);
+            searchMode = false;
+        }
+    }
+
+    @Override
+    public void onAnimationRepeat(Animation animation) {
+
     }
 
     private class IconContainer {
@@ -206,7 +277,7 @@ public class Header extends RelativeLayout {
 
         IconContainer(FrameLayout frameLayout, int image_id) {
             this.frameLayout = frameLayout;
-            Decorator.setRectSizeAndPadding(this.frameLayout, 89, 89, 16, 24, 4, 24);
+//            Decorator.setRectSizeAndPadding(this.frameLayout, 89, 89, 16, 24, 4, 24);
             imageView = (ImageView) frameLayout.findViewById(image_id);
             imageView.setLayerType(LAYER_TYPE_SOFTWARE, null);
 //            Decorator.setSquareSizeAndMargins(imageView, 32, 20, 28, 8, 28);
@@ -240,8 +311,12 @@ public class Header extends RelativeLayout {
         }
 
         public void changeSidePadding(int left, int right) {
-            Decorator.setPadding(frameLayout, left, 20, right, 20);
+//            Decorator.setPadding(frameLayout, left, 20, right, 20);
         }
+    }
+
+    public interface SearchInHeader {
+        void switchSearch();
     }
 
     public interface FragmentDataSender {

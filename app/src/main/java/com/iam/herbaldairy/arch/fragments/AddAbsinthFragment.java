@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -36,33 +37,46 @@ import java.util.Date;
 
 public class AddAbsinthFragment extends Fragment implements Header.HeaderManipulation, AddHerbDialog.HasDataToReload {
 
+    OpenFor openFor;
     RecyclerView view;
     AddAbsintheAdapter adapter;
     LinearLayoutManager manager;
     ArrayList<Herb> herbs = new ArrayList<>();
+    ArrayList<Herb> newHerbs = new ArrayList<>();
     AddHerbDialog.Container container;
 
     ListPopupWindow listPopupWindow;
     ArrayAdapter<String> listPopupAdapter;
     AddHerbDialog dialog;
     String[] herbNames;
+    String[] betterHerbsNames;
 
     Absinth absinth;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("onCreate", "onCreate");
+        openFor = OpenFor.valueOf(getArguments().getString(getString(R.string.edit_absinth_open_for)));
+        if (openFor == OpenFor.Edit) {
+            int position = getArguments().getInt(getString(R.string.edit_absinth_position));
+            absinth = Absinth.absinthes().get(position);
+            herbs = new ArrayList<>();
+            for (Herb herb : absinth.herbs()) {
+                Herb newHerb = new Herb(herb);
+                newHerb.add(herb.weight());
+                herbs.add(newHerb);
+            }
+            newHerbs = new ArrayList<>();
+        }
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = (RecyclerView) inflater.inflate(R.layout.recycler_fragment, container, false);
 
-        herbNames = getResources().getStringArray(R.array.herbs);
-        dialog = new AddHerbDialog(getActivity());
-        listPopupAdapter = new ArrayAdapter<>(
-                getActivity(),
-                R.layout.popup_item,
-                herbNames
-        );
-
-        listPopupWindow = new ListPopupWindow(getActivity());
+        configurePopup();
 
         adapter = new AddAbsintheAdapter();
         manager = new LinearLayoutManager(getContext());
@@ -76,7 +90,7 @@ public class AddAbsinthFragment extends Fragment implements Header.HeaderManipul
 
     @Override
     public svg leftIcon() {
-        return svg.toggle;
+        return svg.back;
     }
 
     @Override
@@ -84,7 +98,7 @@ public class AddAbsinthFragment extends Fragment implements Header.HeaderManipul
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((Header.ToggleClicker)getActivity()).onToggleClick();
+                popBackStack();
             }
         };
     }
@@ -113,10 +127,15 @@ public class AddAbsinthFragment extends Fragment implements Header.HeaderManipul
                 AddAbsintheAdapter.MainVH holder = adapter.data();
                 Log.d("holder", holder + "");
                 if (holder.spiritVolumeET.getText().toString().length() != 0 &&
-                        holder.startDate() != null &&
-                        herbs.size() > 0) {
+                    holder.startDate() != null &&
+                    herbs.size() > 0) {
                     final double spiritVolume = Double.parseDouble(holder.spiritVolumeET.getText().toString());
-                    if (absinth == null) absinth = new Absinth(holder.startDate(), spiritVolume, herbs);
+                    if (absinth == null) {
+                        absinth = new Absinth(holder.startDate(), spiritVolume, herbs);
+                    } else {
+                        absinth.setSpiritVolume(spiritVolume);
+                        absinth.setStartDate(holder.startDate());
+                    }
                     final String sAlcPercent = holder.alcPercentET.getText().toString();
                     absinth.setAlcPercent(Integer.parseInt(sAlcPercent.length() == 0 ? "0" : sAlcPercent));
                     absinth.setComment(holder.commentET.getText().toString());
@@ -125,24 +144,15 @@ public class AddAbsinthFragment extends Fragment implements Header.HeaderManipul
                     absinth.setDistillTemperature(Integer.parseInt(distillTemp.length() == 0 ? "0" : distillTemp));
                     final String sResultVolume = holder.resultVolumeET.getText().toString();
                     absinth.setResultVolume(Double.parseDouble(sResultVolume.length() == 0 ? "0" : sResultVolume));
-                    Absinth.add(absinth);
-
-                    Log.d("absinthe sd", holder.startDate() + "");
-                    Log.d("absinthe sv", spiritVolume + "");
-                    Log.d("absinthe ap", sAlcPercent + "");
-                    Log.d("absinthe c", holder.commentET.getText().toString() + "");
-                    Log.d("absinthe dd", holder.distillDate + "");
-                    Log.d("absinthe dt", distillTemp + "");
-                    Log.d("absinthe rv", sResultVolume + "");
+                    if (openFor == OpenFor.Add) {
+                        Absinth.add(absinth);
+                    } else {
+                        absinth.validateHerbs(herbs, newHerbs);
+                    }
 
                     Absinth.writeToPreferences(getContext());
 
-                    FragmentManager fm = getActivity().getSupportFragmentManager();
-                    FragmentTransaction transaction = fm.beginTransaction();
-                    transaction
-                            .replace(R.id.container, new AbsinthesFragment(), AbsinthesFragment.class.getCanonicalName())
-                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-                            .commit();
+                    popBackStack();
                 } else {
                     Toast
                             .makeText(getContext(),
@@ -153,6 +163,15 @@ public class AddAbsinthFragment extends Fragment implements Header.HeaderManipul
                 }
             }
         };
+    }
+
+    private void popBackStack() {
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction
+                .replace(R.id.container, new AbsinthesFragment(), AbsinthesFragment.class.getCanonicalName())
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                .commit();
     }
 
     @Override
@@ -167,7 +186,7 @@ public class AddAbsinthFragment extends Fragment implements Header.HeaderManipul
 
     @Override
     public String headerTitle() {
-        return "ADD ABSINTHE";
+        return "Edit Absinthe";
     }
 
     @Override
@@ -176,9 +195,19 @@ public class AddAbsinthFragment extends Fragment implements Header.HeaderManipul
     }
 
     @Override
-    public void reloadData(Herb herb) {
-        this.herbs.add(herb);
-        Log.d("weight(herb)", herb.weight() + "");
+    public void onSave(Herb herb) {
+        if (!this.herbs.contains(herb)) {
+            this.herbs.add(herb);
+        } else {
+            this.herbs.get(this.herbs.indexOf(herb)).add(herb.weight());
+        }
+
+        if (openFor == OpenFor.Edit) newHerbs.add(herb);
+        onClose();
+    }
+
+    @Override
+    public void onClose() {
         adapter.notifyDataSetChanged();
     }
 
@@ -211,6 +240,10 @@ public class AddAbsinthFragment extends Fragment implements Header.HeaderManipul
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            Log.d("onBind", position + "");
+            Log.d("onBind", isFooter(position) + "");
+            Log.d("onBind", isHeader(position) + "");
+            Log.d("onBind", herbs.size() + "");
             if (!isFooter(position) && !isHeader(position)) {
                 ((HerbVH)holder).onBind(herbs.get(position-1));
             }
@@ -236,17 +269,20 @@ public class AddAbsinthFragment extends Fragment implements Header.HeaderManipul
 
         class HerbVH extends RecyclerView.ViewHolder {
 
-            Text edit;
+            ImageView edit;
             Text title;
             Text latin;
             Text weight;
             Text volume;
             Text type;
             ImageView image;
+            FrameLayout settingsButton;
 
             HerbVH(View view) {
                 super(view);
-                edit = (Text) view.findViewById(R.id.edit);
+                edit = (ImageView) view.findViewById(R.id.edit);
+                edit.setImageDrawable(svg.settings.drawable());
+                settingsButton = (FrameLayout) view.findViewById(R.id.setbutton);
                 title = (Text) view.findViewById(R.id.title);
                 latin = (Text) view.findViewById(R.id.latin);
                 weight = (Text) view.findViewById(R.id.weight);
@@ -255,16 +291,29 @@ public class AddAbsinthFragment extends Fragment implements Header.HeaderManipul
                 image = (ImageView) view.findViewById(R.id.image);
             }
 
-            void onBind(Herb herb) {
+            void onBind(final Herb herb) {
                 title.setText(herb.name());
                 latin.setText(herb.latin());
                 weight.setText(herb.weight() + "g.");
                 volume.setText(herb.volumeString() + "l");
-                type.setText(" (" + herb.typeString() + ")");
+                type.setText(herb.typeString());
                 Glide.with(getContext())
                         .load(herb.imageURL())
                         .centerCrop()
                         .into(image);
+                settingsButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        HerbEditFragment fragment = new HerbEditFragment();
+                        fragment.setHerb(herb);
+                        FragmentManager fm = getActivity().getSupportFragmentManager();
+                        FragmentTransaction ft = fm.beginTransaction();
+                        ft
+                                .replace(R.id.container, fragment, HerbEditFragment.class.getCanonicalName())
+                                .addToBackStack(null)
+                                .commit();
+                    }
+                });
             }
 
         }
@@ -322,6 +371,17 @@ public class AddAbsinthFragment extends Fragment implements Header.HeaderManipul
                         startDateET.setText(Time.simpleDateFormat.format(startDate));
                     }
                 });
+
+                if (openFor == OpenFor.Edit) {
+                    startDateET.setText(Time.simpleDateFormat.format(absinth.startInfuseDate()));
+                    final Date dd = absinth.distillDate();
+                    distilldateET.setText(dd == null ? "" : Time.simpleDateFormat.format(dd));
+                    spiritVolumeET.setText(absinth.spiritVolume() + "");
+                    resultVolumeET.setText(absinth.resultVolume() + "");
+                    alcPercentET.setText(absinth.alcPercent() + "");
+                    distillTemperatureET.setText(absinth.distillTemperature() + "");
+                    commentET.setText(absinth.comment());
+                }
             }
         }
 
@@ -358,5 +418,26 @@ public class AddAbsinthFragment extends Fragment implements Header.HeaderManipul
         private final int MAIN = 0;
         private final int HERB = 1;
         private final int ADD = 2;
+    }
+
+    private void configurePopup() {
+        herbNames = getResources().getStringArray(R.array.herbs);
+        betterHerbsNames = new String[herbNames.length];
+        for (int i = 0, l = herbNames.length; i < l; i++) {
+            betterHerbsNames[i] = herbNames[i] + " " + Herb.volumesStringForHerbs(Herb.herbsByName(herbNames[i]));
+        }
+        dialog = new AddHerbDialog(getActivity());
+        listPopupAdapter = new ArrayAdapter<>(
+                getActivity(),
+                R.layout.popup_item,
+                betterHerbsNames
+        );
+
+        listPopupWindow = new ListPopupWindow(getActivity());
+    }
+
+    enum OpenFor {
+        Edit,
+        Add
     }
 }
