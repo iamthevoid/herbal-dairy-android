@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/weight"
+        android:layout_weight="1"
+        android:hint="LOGIN"
+        android:inputType="numberSigned"
+        android:textSize="14sp"
+        app:met_bottomTextSize="16dp"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelTextColor="@color/almost_black"
+        app:met_floatingLabelTextSize="14sp"
+        app:met_primaryColor="@color/dark_green"
+        app:met_textColorHint="@color/black"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/login"
+        android:layout_weight="1"
+        android:hint="PASSWORD"
+        android:inputType="numberSigned"
+        android:textSize="14sp"
+        app:met_bottomTextSize="16dp"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelTextColor="@color/almost_black"
+        app:met_floatingLabelTextSize="14sp"
+        app:met_primaryColor="@color/dark_green"
+        app:met_textColorHint="@color/black"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/email"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@+id/password"
+        android:layout_weight="1"
+        android:hint="E-MAIL"
+        android:inputType="numberSigned"
+        android:textSize="14sp"
+        app:met_bottomTextSize="16dp"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelTextColor="@color/almost_black"
+        app:met_floatingLabelTextSize="14sp"
+        app:met_primaryColor="@color/dark_green"
+        app:met_textColorHint="@color/black"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <com.iam.herbaldairy.widget.text.Text
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/signup"
+        android:textColor="#3f9bc4"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:text="SIGN UP"
+        android:layout_below="@+id/email"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dark_green"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/login_button">
+        <com.iam.herbaldairy.widget.text.Text
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_gravity="center"
+            android:layout_margin="16dp"
+            android:text="LOG IN"
+            android:id="@+id/save_text" />
+    </FrameLayout>
+</RelativeLayout>

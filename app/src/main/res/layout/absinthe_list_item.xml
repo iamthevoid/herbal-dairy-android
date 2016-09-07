@@ -28,96 +28,108 @@
         <com.iam.herbaldairy.widget.text.Text
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/number"
+            android:textColor="@color/shadow_gray"
+            android:text="#001."
+            android:textSize="14dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="8dp" />
+        <com.iam.herbaldairy.widget.text.Text
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="29 Сентября, 2016"
             android:id="@+id/date"
             android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_margin="8dp"
-            android:textColor="@color/black"
-            android:textSize="20dp" />
+            android:layout_alignParentLeft="false"
+            android:textColor="@color/dark_gray"
+            android:textSize="14dp"
+            android:layout_toRightOf="@+id/number"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp" />
+        <com.iam.herbaldairy.widget.text.Text
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="A lot of absinthe"
+            android:textColor="@color/dark_gray"
+            android:id="@+id/name"
+            android:layout_below="@+id/number"
+            android:layout_alignLeft="@+id/date"
+            android:layout_marginBottom="8dp" />
 
         <com.iam.herbaldairy.widget.text.Text
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="volume: "
+            android:text="Vol."
             android:id="@+id/vtext"
             android:layout_alignParentLeft="true"
-            android:textSize="16dp"
-            android:layout_below="@+id/date"
+            android:textSize="10dp"
+            android:layout_below="@+id/name"
             android:layout_marginRight="0dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp" />
+            android:textColor="@color/black"
+            android:paddingBottom="4dp" />
 
         <com.iam.herbaldairy.widget.text.Text
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1.8l"
-            android:textColor="@color/dark_text_green"
+            android:textColor="@color/herb_quantity_gray"
             android:id="@+id/volume"
             android:layout_alignParentLeft="false"
-            android:layout_below="@+id/date"
-            android:textSize="16dp"
+            android:layout_below="@+id/name"
+            android:textSize="10dp"
             android:layout_toRightOf="@+id/vtext"
             android:layout_marginTop="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp" />
+            android:paddingBottom="4dp" />
 
         <com.iam.herbaldairy.widget.text.Text
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="interval: "
+            android:text="Infuse time: "
             android:id="@+id/itext"
-            android:layout_below="@+id/date"
-            android:textSize="16dp"
+            android:layout_below="@+id/name"
+            android:textSize="10dp"
             android:layout_toLeftOf="@+id/interval"
             android:layout_marginTop="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginBottom="8dp" />
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/black"
+            android:paddingBottom="4dp" />
 
         <com.iam.herbaldairy.widget.text.Text
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="20d"
-            android:textColor="@color/dark_text_green"
+            android:textColor="@color/herb_quantity_gray"
 
             android:id="@+id/interval"
-            android:layout_below="@+id/date"
+            android:layout_below="@+id/name"
             android:layout_centerHorizontal="true"
-            android:textSize="16dp"
+            android:textSize="10dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginRight="8dp" />
-
-        <com.iam.herbaldairy.widget.text.Text
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="stage: "
-            android:id="@+id/stext"
-            android:layout_alignParentRight="false"
-            android:layout_below="@+id/date"
-            android:textSize="16dp"
-            android:layout_toLeftOf="@+id/stage"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginRight="8dp"
+            android:paddingBottom="4dp" />
 
         <com.iam.herbaldairy.widget.text.Text
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Production"
             android:id="@+id/stage"
-            android:textColor="@color/dark_text_green"
+            android:textColor="@color/herb_quantity_gray"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/date"
-            android:textSize="16dp"
+            android:layout_below="@+id/name"
+            android:textSize="10dp"
             android:layout_marginTop="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp" />
+            android:paddingBottom="4dp" />
 
         <FrameLayout
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:id="@+id/setbutton"
             android:layout_margin="8dp"
             android:layout_alignParentRight="true">

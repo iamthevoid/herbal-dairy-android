@@ -21,8 +21,8 @@
         android:layout_margin="2dp" />
 
     <FrameLayout
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:id="@+id/setbutton"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true" />

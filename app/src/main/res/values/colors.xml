@@ -13,6 +13,7 @@
     <color name="almost_black">#1C1C1C</color>
     <color name="transparent_black_25">#44000000</color>
     <color name="dark_gray_text">#262626</color>
+    <color name="dark_gray">#2b2b2b</color>
     <color name="text_in_product_info">#333333</color>
     <color name="search_gray">#999999</color>
     <color name="shadow_gray">#aaaaaa</color>

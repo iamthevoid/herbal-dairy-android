@@ -78,6 +78,7 @@ public enum svg {
     makaronyi_i_lapsha("imakaronyi-i-lapsha", R.raw.imakaronyi_i_lapsha),
     message("imessage", R.raw.imessage),
     messagewhite("imessagewhite", R.raw.imessagewhite),
+    mint("treatment_icon5", R.raw.treatment_icon5),
     minus("iminus", R.raw.iminus),
     moloko("imoloko", R.raw.imoloko),
     moreproduktyi("imoreproduktyi", R.raw.imoreproduktyi),

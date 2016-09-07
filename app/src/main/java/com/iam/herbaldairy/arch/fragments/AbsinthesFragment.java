@@ -15,16 +15,16 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.iam.herbaldairy.DeleteGestureDetector;
 import com.iam.herbaldairy.R;
-import com.iam.herbaldairy.Time;
-import com.iam.herbaldairy.entities.Absinth;
+import com.iam.herbaldairy.arch.db.DBCache;
+import com.iam.herbaldairy.util.Time;
+import com.iam.herbaldairy.entities.Absinthe;
+import com.iam.herbaldairy.widget.Divider;
 import com.iam.herbaldairy.widget.Header;
 import com.iam.herbaldairy.widget.assets.svg;
 import com.iam.herbaldairy.widget.text.Text;
@@ -40,15 +40,16 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Absinth.readFromPreferences(getContext());
+        DBCache.getInstance().userAbsinthes().readFromPreferences(getContext());
         view = (RecyclerView) inflater.inflate(R.layout.recycler_fragment, container, false);
+        view.addItemDecoration(new Divider(getContext(), R.drawable.gray_divider, new int[]{}, new int[]{0,0}));
 
         listAdapter = new AbsintheAdapter(getContext());
         manager = new LinearLayoutManager(getContext());
         view.setAdapter(listAdapter);
         view.setLayoutManager(manager);
         listAdapter.notifyDataSetChanged();
-        Log.d("absinthe cococo", Absinth.absinthes().size() + "");
+        Log.d("absinthe cococo", DBCache.getInstance().userAbsinthes().absinthes().size() + "");
 
         ((Header.FragmentDataSender)getActivity()).onFragmentOpen(this);
         Log.d("onCreateView", "done");
@@ -110,7 +111,7 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
             @Override
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
-                bundle.putString(getString(R.string.edit_absinth_open_for), AddAbsinthFragment.OpenFor.Add.name());
+                bundle.putString(getString(R.string.edit_absinth_open_for), AddAbsintheFragment.OpenFor.Add.name());
                 showEditAbsintheFragment(bundle);
             }
         };
@@ -119,10 +120,10 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
     private void showEditAbsintheFragment(Bundle bundle) {
         FragmentManager manager = ((AppCompatActivity)getContext()).getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        AddAbsinthFragment fragment = new AddAbsinthFragment();
+        AddAbsintheFragment fragment = new AddAbsintheFragment();
         fragment.setArguments(bundle);
         transaction
-                .replace(R.id.container, fragment, AddAbsinthFragment.class.getCanonicalName())
+                .replace(R.id.container, fragment, AddAbsintheFragment.class.getCanonicalName())
                 .setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
     }
@@ -167,8 +168,8 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
 
         @Override
         public int getItemCount() {
-            System.out.println(Absinth.absinthes.size());
-            return Absinth.absinthes.size();
+            System.out.println(DBCache.getInstance().userAbsinthes().absinthes.size());
+            return DBCache.getInstance().userAbsinthes().absinthes.size();
         }
 
         public class AbsintheVH extends RecyclerView.ViewHolder implements View.OnTouchListener {
@@ -178,6 +179,8 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
             private Text date;
             private Text volume;
             private Text interval;
+            private Text name;
+            private Text number;
             private Text stage;
 
             private ImageView editIcon;
@@ -199,6 +202,8 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
                 deleteIcon = (ImageView) itemView.findViewById(R.id.deleteicon);
                 deleteIcon.setImageDrawable(svg.xwhite.drawable());
                 date = (Text) itemView.findViewById(R.id.date);
+                name = (Text) itemView.findViewById(R.id.name);
+                number = (Text) itemView.findViewById(R.id.number);
                 volume = (Text) itemView.findViewById(R.id.volume);
                 interval = (Text) itemView.findViewById(R.id.interval);
                 stage = (Text) itemView.findViewById(R.id.stage);
@@ -210,13 +215,13 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
             }
 
             public void onBind(final int position) {
-                final Absinth absinth = Absinth.absinthes.get(position);
-                final Date idate = absinth.startInfuseDate();
+                final Absinthe absinthe = DBCache.getInstance().userAbsinthes().absinthes.get(position);
+                final Date idate = absinthe.startInfuseDate();
                 deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        int pos = Absinth.absinthes().indexOf(absinth);
-                        Absinth.remove(absinth, getContext());
+                        int pos = DBCache.getInstance().userAbsinthes().absinthes().indexOf(absinthe);
+                        DBCache.getInstance().userAbsinthes().remove(absinthe, getContext());
                         AbsintheAdapter.this.notifyDataSetChanged();
                     }
                 });
@@ -225,16 +230,20 @@ public class AbsinthesFragment extends Fragment implements Header.HeaderManipula
                     @Override
                     public void onClick(View view) {
                         Bundle bundle = new Bundle();
-                        bundle.putString(getString(R.string.edit_absinth_open_for), AddAbsinthFragment.OpenFor.Edit.name());
+                        bundle.putString(getString(R.string.edit_absinth_open_for), AddAbsintheFragment.OpenFor.Edit.name());
                         bundle.putInt(getString(R.string.edit_absinth_position), position);
                         showEditAbsintheFragment(bundle);
                     }
                 });
 
-                this.date.setText(Time.monthDay(idate) + " " + Time.monthName(idate) + ", " + Time.year(idate));
-                volume.setText((!absinth.isDone() ? absinth.spiritVolume() : absinth.resultVolume()) + "l");
-                interval.setText(absinth.getInfuseInterval() < 21 ? (absinth.getInfuseInterval() + "d") : ((absinth.getInfuseInterval() / 7) + "w"));
-                stage.setText(absinth.stage().toString());
+                number.setText(String.format("#%03d", DBCache.getInstance().userAbsinthes().absinthes.size() - position));
+                final String name = absinthe.name();
+                this.name.setText(name == null || name.length() == 0 ? "<undefined>" : name);
+
+                this.date.setText(Time.monthDay(idate) + " " + Time.monthName(idate) + " " + Time.year(idate));
+                volume.setText((!absinthe.isDone() ? absinthe.spiritVolume() : absinthe.resultVolume()) + "l");
+                interval.setText(absinthe.getInfuseInterval() < 21 ? (absinthe.getInfuseInterval() + "d") : ((absinthe.getInfuseInterval() / 7) + "w"));
+                stage.setText(absinthe.stage().toString());
             }
 
             @Override

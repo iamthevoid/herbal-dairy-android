@@ -81,10 +81,12 @@ public final class Decorator {
     private static int widthPixels;
     private static int heightPixels;
     private static int appHeight;
+    private static float dencity;
 
     synchronized public static void init(Activity activity) {
         DisplayMetrics metrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        dencity = metrics.density;
         widthPixels = metrics.widthPixels;
         heightPixels = metrics.heightPixels;
         int resourceId = activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
@@ -92,6 +94,12 @@ public final class Decorator {
             statusBarHeight = activity.getResources().getDimensionPixelSize(resourceId);
         }
         appHeight = heightPixels - statusBarHeight;
+    }
+
+    public static float getpixels(int dp){
+        int px = (int) (dp * dencity + 0.5f);
+        return px;
+
     }
 
     synchronized public static int getScreenWidth() {

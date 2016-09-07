@@ -176,5 +176,21 @@
         android:layout_alignParentLeft="true"
         android:layout_toLeftOf="@+id/setDistillTime" />
 
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:met_floatingLabelTextColor="@color/almost_black"
+        app:met_bottomTextSize="16dp"
+        app:met_primaryColor="@color/dark_green"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelTextSize="14sp"
+        app:met_textColorHint="@color/black"
+        android:id="@+id/name"
+        android:hint="NAME"
+        android:layout_below="@+id/comment"
+        android:textSize="14sp"
+        android:layout_weight="1"/>
+
 
 </LinearLayout>

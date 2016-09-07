@@ -13,19 +13,21 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".arch.root.DrawerActivity">
+        <activity android:name=".arch.root.ShieldActivity">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
+        <activity android:name=".arch.root.DrawerActivity"/>
+
 
         <service
-            android:name=".arch.InfusionTickerService"
+            android:name=".arch.ticker.InfusionTickerService"
             android:enabled="true"
             android:process=""/>
-        <receiver android:process=":remote" android:name=".arch.AlarmBroadcastReceiver"/>
-        <receiver android:name=".arch.AutoStart">
+        <receiver android:process=":remote" android:name=".arch.ticker.AlarmBroadcastReceiver"/>
+        <receiver android:name=".arch.ticker.AutoStart">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>

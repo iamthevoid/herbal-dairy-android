@@ -17,7 +17,9 @@ import android.widget.TextView;
 import com.iam.herbaldairy.R;
 import com.iam.herbaldairy.arch.fragments.AbsinthesFragment;
 import com.iam.herbaldairy.arch.fragments.AlcoCalcFragment;
-import com.iam.herbaldairy.arch.fragments.HerbFragment;
+import com.iam.herbaldairy.arch.fragments.HerbsFragment;
+import com.iam.herbaldairy.arch.fragments.LoginFragment;
+import com.iam.herbaldairy.entities.User;
 import com.iam.herbaldairy.widget.Decorator;
 import com.iam.herbaldairy.widget.NestedLinearLayoutManager;
 import com.iam.herbaldairy.widget.assets.font;
@@ -129,7 +131,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.MainViewHo
                 Fragment fragment = null;
                 switch (options) {
                     case herbas:
-                        fragment = new HerbFragment();
+                        fragment = new HerbsFragment();
                         break;
                     case absinthes:
                         fragment = new AbsinthesFragment();
@@ -137,6 +139,12 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.MainViewHo
                     case calc:
                         fragment = new AlcoCalcFragment();
                         break;
+                    case settings:
+                        if (User.authorized) {
+
+                        } else {
+                            fragment = new LoginFragment();
+                        }
                 }
                 selected = options.ordinal();
                 ((DrawerActivity)context).clearFragmentStack(fragment);

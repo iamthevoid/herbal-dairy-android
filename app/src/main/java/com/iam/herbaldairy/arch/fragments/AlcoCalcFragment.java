@@ -3,8 +3,6 @@ package com.iam.herbaldairy.arch.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,15 +10,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.iam.herbaldairy.Calculator;
-import com.iam.herbaldairy.Editor;
+import com.iam.herbaldairy.util.Calculator;
+import com.iam.herbaldairy.util.Editor;
 import com.iam.herbaldairy.R;
 import com.iam.herbaldairy.widget.Header;
 import com.iam.herbaldairy.widget.assets.svg;
 import com.iam.herbaldairy.widget.text.Text;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class AlcoCalcFragment extends Fragment implements Header.HeaderManipulation {
 
@@ -173,7 +168,7 @@ public class AlcoCalcFragment extends Fragment implements Header.HeaderManipulat
         return
                 !alcResultPercentET.getText().toString().equals("") &&
                         !alcSourcePercentET.getText().toString().equals("") &&
-                        spiritVolumeET.getText().toString().equals("");
+                        !spiritVolumeET.getText().toString().equals("");
     }
 
 

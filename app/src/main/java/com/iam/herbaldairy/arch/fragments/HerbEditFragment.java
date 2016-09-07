@@ -19,8 +19,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.iam.herbaldairy.R;
-import com.iam.herbaldairy.Web;
-import com.iam.herbaldairy.entities.Herb;
+import com.iam.herbaldairy.util.Web;
+import com.iam.herbaldairy.arch.db.DBCache;
+import com.iam.herbaldairy.entities.Absinthe;
+import com.iam.herbaldairy.entities.HerbOwned;
 import com.iam.herbaldairy.entities.Type;
 import com.iam.herbaldairy.widget.Header;
 import com.iam.herbaldairy.widget.assets.svg;
@@ -31,10 +33,11 @@ import org.jsoup.nodes.Document;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 public class HerbEditFragment extends Fragment implements Header.HeaderManipulation {
 
-    public Herb herb;
+    public HerbOwned herb;
 
     View view;
 
@@ -53,14 +56,14 @@ public class HerbEditFragment extends Fragment implements Header.HeaderManipulat
     ListPopupWindow lpw;
     ArrayAdapter<String> adapter;
 
-    String[] types;
+    ArrayList<String> types;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.herb_edit_fragment, container, false);
 
-        types = Type.names();
+        types = DBCache.getInstance().typeNames();
         lpw = new ListPopupWindow(getContext());
         adapter = new ArrayAdapter<>(getContext(), R.layout.popup_item, types);
 
@@ -79,7 +82,7 @@ public class HerbEditFragment extends Fragment implements Header.HeaderManipulat
         name.setText(herb.name());
         selectTypeButton = (LinearLayout) view.findViewById(R.id.selectType);
         type = (Text) view.findViewById(R.id.type);
-        type.setText(herb.typeString());
+        type.setText(herb.typedHerb().typeString());
         selectTypeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -91,7 +94,7 @@ public class HerbEditFragment extends Fragment implements Header.HeaderManipulat
                 lpw.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        type.setText(types[i].toUpperCase());
+                        type.setText(types.get(i).toUpperCase());
                         lpw.dismiss();
                     }
                 });
@@ -101,17 +104,17 @@ public class HerbEditFragment extends Fragment implements Header.HeaderManipulat
         weight = (EditText) view.findViewById(R.id.weight);
         weight.setText(herb.weight() + "");
         volumeFactor = (EditText) view.findViewById(R.id.volumeFactor);
-        volumeFactor.setText(herb.volumeFactor() + "");
+        volumeFactor.setText(herb.typedHerb().volumeFactor() + "");
         dryTime = (EditText) view.findViewById(R.id.dryTime);
-        dryTime.setText(herb.dryTime() + "");
+        dryTime.setText(herb.typedHerb().dryTime() + "");
         dryFactor = (EditText) view.findViewById(R.id.dryFactor);
-        dryFactor.setText(herb.dryFactor() + "");
+        dryFactor.setText(herb.typedHerb().dryFactor() + "");
 
         ((Header.FragmentDataSender)getActivity()).onFragmentOpen(this);
         return view;
     }
 
-    public void setHerb(Herb herb) {
+    public void setHerb(HerbOwned herb) {
         this.herb = herb;
     }
 
@@ -151,11 +154,11 @@ public class HerbEditFragment extends Fragment implements Header.HeaderManipulat
             @Override
             public void onClick(View view) {
 
-                herb.setDryFactor(Double.parseDouble(dryFactor.getText().toString()));
-                herb.setDryTime(Double.parseDouble(dryTime.getText().toString()));
-                herb.setType(Type.valueOf(type.getText().toString().toLowerCase()));
-                herb.setWeight(Integer.parseInt(weight.getText().toString()));
-                herb.setVolumeFactor(Double.parseDouble(volumeFactor.getText().toString()));
+                herb.typedHerb().setDryFactor(Double.parseDouble(dryFactor.getText().toString().equals("") ? "0" : dryFactor.getText().toString()));
+                herb.typedHerb().setDryTime(Double.parseDouble(dryTime.getText().toString().equals("") ? "0" : dryTime.getText().toString()));
+                herb.typedHerb().setType(Type.valueOf(type.getText().toString().toLowerCase()));
+                herb.setWeight(Integer.parseInt(weight.getText().toString().equals("") ? "" : weight.getText().toString()));
+                herb.typedHerb().setVolumeFactor(Double.parseDouble(volumeFactor.getText().toString().equals("") ? "0" : volumeFactor.getText().toString()));
 
                 Log.d("weight", herb.weight() + "");
 
@@ -163,7 +166,9 @@ public class HerbEditFragment extends Fragment implements Header.HeaderManipulat
 
                 fm.popBackStack();
 
-                Herb.writeToPreferences(getContext());
+                /*String herbs = */DBCache.getInstance().userHerbs().writeToPreferences(getContext());
+                /*String absinthes = */DBCache.getInstance().userAbsinthes().writeToPreferences(getContext());
+//                new Backup(herbs, absinthes).postToDB();
             }
         };
     }
@@ -191,8 +196,8 @@ public class HerbEditFragment extends Fragment implements Header.HeaderManipulat
                 Document doc = Jsoup.parse(s);
                 String imageUrl = imageSrcFromHTML(doc);
                 String lat = latinNameFromHTML(doc);
-                HerbEditFragment.this.herb.setImageURL(imageUrl);
-                HerbEditFragment.this.herb.setLatinName(lat);
+                HerbEditFragment.this.herb.typedHerb().herb().setImageURL(imageUrl);
+                HerbEditFragment.this.herb.typedHerb().herb().setLatinName(lat);
 
             }
         }.execute();

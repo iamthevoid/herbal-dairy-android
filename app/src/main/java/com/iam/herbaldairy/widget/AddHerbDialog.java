@@ -19,8 +19,10 @@ import android.widget.Toast;
 
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.iam.herbaldairy.R;
-import com.iam.herbaldairy.Web;
 import com.iam.herbaldairy.entities.Herb;
+import com.iam.herbaldairy.util.Web;
+import com.iam.herbaldairy.arch.db.DBCache;
+import com.iam.herbaldairy.entities.HerbOwned;
 import com.iam.herbaldairy.entities.Type;
 import com.iam.herbaldairy.widget.assets.svg;
 import com.iam.herbaldairy.widget.text.Text;
@@ -30,11 +32,12 @@ import org.jsoup.nodes.Document;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 public class AddHerbDialog extends RelativeLayout {
 
     private From from;
-    private Herb herb;
+    private HerbOwned herbOwned;
     private String description = "";
     private String imageUrl = "";
 
@@ -57,7 +60,7 @@ public class AddHerbDialog extends RelativeLayout {
     private PopupMenu popupMenu;
     private ArrayAdapter<String> popupAdapter;
 
-    private String[] types = Type.names();
+    private ArrayList<String> types = DBCache.getInstance().typeNames();
 
 
     public AddHerbDialog(Context context) {
@@ -75,7 +78,7 @@ public class AddHerbDialog extends RelativeLayout {
 
         weightET = (EditText) findViewById(R.id.weight);
 
-        popupAdapter = new ArrayAdapter<String>(context, R.layout.popup_item, types);
+        popupAdapter = new ArrayAdapter<>(context, R.layout.popup_item, types);
         selectTypeBTN = (RelativeLayout) findViewById(R.id.selectType);
         selectTypeBTN.setOnClickListener(new OnClickListener() {
             @Override
@@ -109,29 +112,30 @@ public class AddHerbDialog extends RelativeLayout {
                     final Type type = Type.valueOf(stringType);
                     switch (from) {
                         case HerbFragmentByName:
-                            herb.add(getIntFromField(weightET));//, getIntFromField(volumeET));
-                            herb.setType(type);
-                            Herb.addToOwnHerbs(herb);
+                            herbOwned.add(getIntFromField(weightET));//, getIntFromField(volumeET));
+                            herbOwned.typedHerb().setType(type);
+                            DBCache.getInstance().userHerbs().addToOwnHerbs(herbOwned);
                             break;
                         case HerbFragmentByHerb:
-                            if (herb.type() != type) {
-                                herb = new Herb(herb, type);
+                            if (herbOwned.typedHerb().type() != type) {
+                                herbOwned = new HerbOwned(herbOwned, type);
                             }
-                            herb.add(getIntFromField(weightET));//, getIntFromField(volumeET));
-                            Herb.addToOwnHerbs(herb);
+                            herbOwned.add(getIntFromField(weightET));//, getIntFromField(volumeET));
+                            DBCache.getInstance().userHerbs().addToOwnHerbs(herbOwned);
                             break;
                         case AddAbsintheFragmentByName:
-                            herb.add(getIntFromField(weightET));
-                            herb.setType(type);
+                            herbOwned.add(getIntFromField(weightET));
+                            herbOwned.typedHerb().setType(type);
                             break;
                         case AddAbsintheFragmentByHerb:
-                            if (herb.type() != type) {
-                                herb = new Herb(herb, type);
+                            if (herbOwned.typedHerb().type() != type) {
+                                herbOwned = new HerbOwned(herbOwned, type);
                             }
-                            herb.add(getIntFromField(weightET));
+                            herbOwned.add(getIntFromField(weightET));
                             break;
                     }
-                    hasDataToReload.onSave(herb);
+                    DBCache.getInstance().addTypedHerbToDB(herbOwned.typedHerb());
+                    hasDataToReload.onSave(herbOwned);
                     close();
                 } else {
                     Toast.makeText(context, "Подождите окончания загрузки данных", Toast.LENGTH_SHORT).show();
@@ -167,25 +171,31 @@ public class AddHerbDialog extends RelativeLayout {
 
     public void setHerb(String herb, From from) {
         this.from = from;
-        final Herb inOwnHerbs = Herb.herbByName(herb);
+        HerbOwned inOwnHerbs;
+        if (from == From.AddAbsintheFragmentByName) {
+            inOwnHerbs = new HerbOwned(DBCache.getInstance().userHerbs().herbByName(herb));
+        } else {
+            inOwnHerbs = DBCache.getInstance().userHerbs().herbByName(herb);
+        }
+
         herbNameText.setText(herb);
         if (inOwnHerbs != null) {
-            this.herb = new Herb(inOwnHerbs);
-            latinNameText.setText(this.herb.latin());
-            Log.d("weight", this.herb.weight() + "");
+            this.herbOwned = new HerbOwned(inOwnHerbs);
+            latinNameText.setText(this.herbOwned.typedHerb().herb().latinName());
+            Log.d("weight", this.herbOwned.weight() + "");
         } else {
             latinNameText.setText("");
             loadDataFromWiki(herb);
         }
     }
 
-    public void setHerb(Herb herb, From from) {
+    public void setHerb(HerbOwned herb, From from) {
         this.from = from;
-        if (from == From.AddAbsintheFragmentByHerb) this.herb = new Herb(herb);
-        else this.herb = herb;
+        if (from == From.AddAbsintheFragmentByHerb) this.herbOwned = new HerbOwned(herb);
+        else this.herbOwned = herb;
         loaded = true;
-        herbNameText.setText(herb.name());
-        latinNameText.setText(herb.latin());
+        herbNameText.setText(this.herbOwned.name());
+        latinNameText.setText(this.herbOwned.latinName());
     }
 
     public interface Container {
@@ -193,7 +203,7 @@ public class AddHerbDialog extends RelativeLayout {
     }
 
     public interface HasDataToReload {
-        void onSave(Herb herb);
+        void onSave(HerbOwned herb);
         void onClose();
     }
 
@@ -225,10 +235,12 @@ public class AddHerbDialog extends RelativeLayout {
                 latinNameText.setText(lat);
                 loadHerbDetailsProgress.setVisibility(INVISIBLE);
                 loaded = true;
-                AddHerbDialog.this.herb = new Herb(herb);
-//                AddHerbDialog.this.herb.setDescription(description);
-                AddHerbDialog.this.herb.setImageURL(imageUrl);
-                AddHerbDialog.this.herb.setLatinName(lat);
+                AddHerbDialog.this.herbOwned = new HerbOwned(herb);
+//                AddHerbDialog.this.herbOwned.setDescription(description);
+                final Herb herb = AddHerbDialog.this.herbOwned.typedHerb().herb();
+                herb.setImageURL(imageUrl);
+                herb.setLatinName(lat);
+                DBCache.getInstance().addHerbToDB(herb);
                 loaded = true;
 
             }

@@ -2,11 +2,13 @@ package com.iam.herbaldairy.widget;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -42,6 +44,8 @@ public class Header extends RelativeLayout implements Animation.AnimationListene
     private RelativeLayout titleHolder;
 
     private MaterialEditText search_et;
+
+    private TextWatcher textWatcher;
 
     public Header(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
@@ -206,6 +210,7 @@ public class Header extends RelativeLayout implements Animation.AnimationListene
 
     public void decorateHeader(HeaderManipulation callbacks) {
         this.callbacks = callbacks;
+        if (searchMode) disableSearch();
         setTitle(callbacks);
         setSubtitle(callbacks);
         setLeftSideImage(callbacks);
@@ -214,9 +219,25 @@ public class Header extends RelativeLayout implements Animation.AnimationListene
         setTextButton(callbacks);
     }
 
+    public void setOnTextChangedListenerForSearch(TextWatcher textWatcher) {
+        if (this.textWatcher == null) {
+            this.search_et.addTextChangedListener(textWatcher);
+        } else {
+            this.search_et.removeTextChangedListener(this.textWatcher);
+            this.textWatcher = null;
+            this.search_et.addTextChangedListener(textWatcher);
+        }
+        this.textWatcher = textWatcher;
+    }
+
+    public EditText getSearchEditText() {
+        return search_et;
+    }
+
     public void switchSearch() {
-        if (searchMode && !animationInProgress)
-        {
+        if (searchMode && search_et.getText().length() > 0) {
+            search_et.setText("");
+        } else if (searchMode && !animationInProgress) {
             disableSearch();
 //            searchMode = false;
         }
@@ -301,23 +322,14 @@ public class Header extends RelativeLayout implements Animation.AnimationListene
         public svg getSvg() {
             return drawable;
         }
-
-        public ViewGroup.LayoutParams getLayoutParams(){
-            return imageView.getLayoutParams();
-        }
-
-        public ImageView getImageView() {
-            return imageView;
-        }
-
-        public void changeSidePadding(int left, int right) {
-//            Decorator.setPadding(frameLayout, left, 20, right, 20);
-        }
     }
 
     public interface SearchInHeader {
         void switchSearch();
+        void setOnTextListener(TextWatcher textWatcher);
+        EditText getSearch();
     }
+
 
     public interface FragmentDataSender {
         void onFragmentOpen(HeaderManipulation fragment);

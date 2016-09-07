@@ -10,12 +10,13 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.TranslateAnimation;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,18 +25,14 @@ import android.widget.Toast;
 
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.iam.herbaldairy.R;
-import com.iam.herbaldairy.Time;
-import com.iam.herbaldairy.arch.InfusionTickerService;
-import com.iam.herbaldairy.arch.fragments.HerbFragment;
-import com.iam.herbaldairy.entities.Absinth;
-import com.iam.herbaldairy.entities.Herb;
+import com.iam.herbaldairy.arch.db.DBCache;
+import com.iam.herbaldairy.arch.fragments.HerbsFragment;
+import com.iam.herbaldairy.arch.ticker.InfusionTickerService;
+import com.iam.herbaldairy.entities.Absinthe;
+import com.iam.herbaldairy.widget.AddHerbDialog;
 import com.iam.herbaldairy.widget.Decorator;
 import com.iam.herbaldairy.widget.Divider;
 import com.iam.herbaldairy.widget.Header;
-import com.iam.herbaldairy.widget.AddHerbDialog;
-
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 public class DrawerActivity extends AppCompatActivity implements DrawerAdapter.DrawerCallbacks,
         Header.FragmentDataSender,
@@ -74,7 +71,6 @@ public class DrawerActivity extends AppCompatActivity implements DrawerAdapter.D
         Decorator.init(this);
 
         restoreUserData();
-
         startService(new Intent(this, InfusionTickerService.class));
 
         setContentView(R.layout.drawer_activity);
@@ -145,7 +141,7 @@ public class DrawerActivity extends AppCompatActivity implements DrawerAdapter.D
         };
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, new HerbFragment(), HerbFragment.class.getCanonicalName())
+                .replace(R.id.container, new HerbsFragment(), HerbsFragment.class.getCanonicalName())
                 .commit();
 
         Drawer.setDrawerListener(mDrawerToggle);
@@ -239,6 +235,8 @@ public class DrawerActivity extends AppCompatActivity implements DrawerAdapter.D
         }
     }
 
+
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -252,18 +250,29 @@ public class DrawerActivity extends AppCompatActivity implements DrawerAdapter.D
     }
 
     private void saveUserData() {
-        Herb.writeToPreferences(getApplicationContext());
-        Absinth.writeToPreferences(getApplicationContext());
+        String herbs = DBCache.getInstance().userHerbs().writeToPreferences(getApplicationContext());
+        String absinthes = DBCache.getInstance().userAbsinthes().writeToPreferences(getApplicationContext());
+//        new Backup(herbs, absinthes).postToDB();
     }
 
     private void restoreUserData() {
-        Herb.readFromPreferences(getApplicationContext());
-        Absinth.readFromPreferences(getApplicationContext());
+        DBCache.getInstance().userHerbs().readFromPreferences(getApplicationContext());
+        DBCache.getInstance().userAbsinthes().readFromPreferences(getApplicationContext());
     }
 
     @Override
     public void switchSearch() {
         header.switchSearch();
+    }
+
+    @Override
+    public void setOnTextListener(TextWatcher textWatcher) {
+        header.setOnTextChangedListenerForSearch(textWatcher);
+    }
+
+    @Override
+    public EditText getSearch() {
+        return header.getSearchEditText();
     }
 
     @Override
@@ -274,5 +283,9 @@ public class DrawerActivity extends AppCompatActivity implements DrawerAdapter.D
     @Override
     public void hideProgress() {
         progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    public Header getHeader() {
+        return header;
     }
 }

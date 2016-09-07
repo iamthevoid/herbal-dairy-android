@@ -4,9 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.AssetManager;
 
-import com.iam.herbaldairy.entities.Absinth;
-import com.iam.herbaldairy.entities.Herb;
-
 public class HerbalDairy extends Application {
 
     public static Context context;
@@ -17,7 +14,5 @@ public class HerbalDairy extends Application {
         super.onCreate();
         context = getApplicationContext();
         assetManager = getAssets();
-        Herb.readFromPreferences(context);
-        Absinth.readFromPreferences(context);
     }
 }
